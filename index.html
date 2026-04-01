@@ -1,154 +1,222 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>CONTEC 건강 챌린지</title>
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#1B4F8E" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="건강챌린지" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <title>CONTEC 챌린지</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#0D1B3E"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="CONTEC챌린지"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --blue: #1B4F8E; --blue-dark: #143d6e; --blue-light: #B5D4F4; --blue-pale: #E6F1FB;
-      --gold: #FAC775; --silver: #D3D1C7; --bronze: #F5C4B3;
-      --text: #1a1a1a; --text-sub: #666; --text-hint: #999;
-      --border: rgba(0,0,0,0.08); --bg: #f4f6fb; --card: #fff; --danger: #e24b4a;
-      --c-steps: #1B4F8E; --c-exercise: #1D9E75; --c-sleep: #7B5EA7; --c-water: #2196F3;
+      --navy: #0D1B3E;
+      --navy2: #1a2d5a;
+      --blue: #1B4F8E;
+      --sky: #4A90D9;
+      --sky-light: #c8e0f8;
+      --gold: #F5C842;
+      --silver: #C0C0C0;
+      --bronze: #CD7F32;
+      --green: #1D9E75;
+      --red: #E24B4A;
+      --orange: #F07C2A;
+      --purple: #7B5EA7;
+      --text: #1a1a1a;
+      --text-sub: #555;
+      --text-hint: #999;
+      --border: rgba(0,0,0,0.08);
+      --bg: #f0f4fb;
+      --card: #fff;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-    .screen { display: none; min-height: 100vh; }
-    .screen.active { display: flex; flex-direction: column; }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+    .screen{display:none;min-height:100vh;flex-direction:column;}
+    .screen.active{display:flex;}
 
-    /* LOGIN */
-    #screen-login { align-items: center; justify-content: center; padding: 2rem 1.25rem; background: linear-gradient(160deg, #eef2fb 0%, #e4ecf7 100%); }
-    .login-card { width: 100%; max-width: 380px; background: var(--card); border-radius: 24px; padding: 2.5rem 2rem; box-shadow: 0 8px 32px rgba(27,79,142,0.12); }
-    .login-logo { text-align: center; margin-bottom: 2rem; }
-    .login-logo img { width: 150px; height: auto; display: block; margin: 0 auto 12px; }
-    .login-logo .app-name { font-size: 17px; font-weight: 700; color: var(--blue); }
-    .login-logo .app-sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; }
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-sub); margin-bottom: 6px; }
-    .field input { width: 100%; padding: 11px 14px; font-size: 15px; font-family: inherit; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
-    .field input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(27,79,142,0.12); background: #fff; }
-    .pw-wrap { position: relative; }
-    .pw-wrap input { padding-right: 56px; }
-    .pw-eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-hint); background: none; border: none; cursor: pointer; padding: 4px; }
-    .error-msg { font-size: 12px; color: var(--danger); margin-top: 6px; display: none; }
-    .btn-login { width: 100%; padding: 13px; margin-top: 8px; background: var(--blue); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; }
-    .btn-login:hover { background: var(--blue-dark); }
-    .login-hint { text-align: center; font-size: 12px; color: var(--text-hint); margin-top: 14px; }
+    /* ── LOGIN ── */
+    #screen-login{align-items:center;justify-content:center;padding:2rem 1.25rem;background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#1B4F8E 100%);}
+    .login-card{width:100%;max-width:380px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:2.5rem 2rem;backdrop-filter:blur(10px);}
+    .login-logo{text-align:center;margin-bottom:2rem;}
+    .login-logo img{width:140px;height:auto;display:block;margin:0 auto 14px;filter:brightness(0) invert(1);}
+    .login-logo .app-name{font-size:20px;font-weight:900;color:#fff;letter-spacing:1px;}
+    .login-logo .app-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;}
+    .field{margin-bottom:14px;}
+    .field label{display:block;font-size:12px;font-weight:500;color:rgba(255,255,255,0.7);margin-bottom:6px;}
+    .field input{width:100%;padding:12px 14px;font-size:15px;font-family:inherit;border:1px solid rgba(255,255,255,0.2);border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;outline:none;transition:border-color 0.15s;}
+    .field input::placeholder{color:rgba(255,255,255,0.35);}
+    .field input:focus{border-color:var(--sky);background:rgba(255,255,255,0.15);}
+    .pw-wrap{position:relative;}
+    .pw-wrap input{padding-right:56px;}
+    .pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:rgba(255,255,255,0.5);background:none;border:none;cursor:pointer;padding:4px;}
+    .error-msg{font-size:12px;color:#ff8080;margin-top:6px;display:none;}
+    .btn-login{width:100%;padding:13px;margin-top:8px;background:var(--sky);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:background 0.15s;}
+    .btn-login:hover{background:#357ABD;}
+    .login-hint{text-align:center;font-size:12px;color:rgba(255,255,255,0.4);margin-top:14px;}
 
-    /* TOPBAR */
-    .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 1.25rem; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-    .topbar img { height: 22px; width: auto; }
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .topbar-name { font-size: 13px; color: var(--text-sub); }
-    .topbar-name strong { color: var(--text); font-weight: 700; }
-    .btn-logout { font-size: 12px; color: var(--text-hint); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-family: inherit; }
+    /* ── TOPBAR ── */
+    .topbar{background:var(--navy);padding:0 1.25rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .topbar img{height:20px;width:auto;filter:brightness(0) invert(1);}
+    .topbar-right{display:flex;align-items:center;gap:10px;}
+    .topbar-name{font-size:13px;color:rgba(255,255,255,0.7);}
+    .topbar-name strong{color:#fff;font-weight:700;}
+    .btn-logout{font-size:12px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 10px;cursor:pointer;font-family:inherit;}
 
-    .main-content { flex: 1; overflow-y: auto; padding: 1.25rem; padding-bottom: 5rem; }
+    /* ── PAGES ── */
+    .page{flex:1;overflow-y:auto;padding:1.25rem;padding-bottom:5rem;display:none;}
+    .page.active{display:block;}
 
-    /* TODAY HEADER */
-    .today-header { background: var(--blue); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; color: white; display: flex; align-items: center; justify-content: space-between; }
-    .today-date { font-size: 12px; opacity: 0.8; margin-bottom: 2px; }
-    .today-title { font-size: 17px; font-weight: 700; }
-    .today-badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 500; }
+    /* ── MONTH BANNER ── */
+    .month-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem;color:#fff;display:flex;align-items:center;justify-content:space-between;}
+    .mb-left .mb-sub{font-size:11px;opacity:0.7;margin-bottom:3px;}
+    .mb-left .mb-title{font-size:18px;font-weight:900;letter-spacing:-0.5px;}
+    .mb-reset{font-size:11px;background:rgba(255,255,255,0.15);border-radius:20px;padding:5px 12px;}
 
-    .section-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; letter-spacing: 0.3px; }
+    /* ── CHALLENGE CARDS ── */
+    .challenge-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
+    .ch-card{background:var(--card);border-radius:18px;border:1.5px solid var(--border);padding:1.1rem;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;position:relative;overflow:hidden;}
+    .ch-card:active{transform:scale(0.97);}
+    .ch-card:hover{box-shadow:0 6px 20px rgba(0,0,0,0.1);}
+    .ch-accent{position:absolute;top:0;left:0;right:0;height:4px;border-radius:18px 18px 0 0;}
+    .ch-icon{font-size:28px;margin-bottom:8px;}
+    .ch-label{font-size:11px;font-weight:700;color:var(--text-sub);letter-spacing:0.3px;margin-bottom:4px;}
+    .ch-value{font-size:24px;font-weight:900;color:var(--text);line-height:1;}
+    .ch-unit{font-size:11px;color:var(--text-hint);margin-top:2px;}
+    .ch-action{font-size:11px;font-weight:600;margin-top:8px;}
+    .ch-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700;}
 
-    /* INPUT CARDS */
-    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
-    .input-card { background: var(--card); border-radius: 16px; border: 1.5px solid var(--border); padding: 1rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
-    .input-card:active { transform: scale(0.97); }
-    .ic-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 16px 16px 0 0; opacity: 0; transition: opacity 0.2s; }
-    .input-card.done .ic-bar { opacity: 1; }
-    .ic-icon { font-size: 22px; margin-bottom: 6px; }
-    .ic-label { font-size: 11px; color: var(--text-sub); font-weight: 500; margin-bottom: 4px; }
-    .ic-value { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
-    .ic-unit { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
-    .ic-edit { font-size: 11px; font-weight: 500; margin-top: 6px; }
+    /* ── SECTION TITLE ── */
+    .sec-title{font-size:13px;font-weight:700;color:var(--text-sub);margin-bottom:10px;letter-spacing:0.3px;}
 
-    /* SAVE BUTTON */
-    .btn-save { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1.5rem; }
-    .btn-save:disabled { background: var(--text-hint); cursor: not-allowed; }
+    /* ── RANKING ── */
+    .rank-tabs{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;padding-bottom:4px;}
+    .rank-tab{flex-shrink:0;padding:7px 16px;font-size:12px;font-weight:600;border:1.5px solid var(--border);border-radius:20px;background:var(--card);color:var(--text-sub);cursor:pointer;font-family:inherit;white-space:nowrap;}
+    .rank-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+    .rank-list{background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden;}
+    .rank-row{display:flex;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--border);}
+    .rank-row:last-child{border-bottom:none;}
+    .rank-row.is-me{background:#f0f6ff;}
+    .rank-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;background:var(--bg);color:var(--text-sub);}
+    .rank-num.r1{background:var(--gold);color:#7a4a00;}
+    .rank-num.r2{background:var(--silver);color:#444;}
+    .rank-num.r3{background:var(--bronze);color:#5a2d00;}
+    .rank-avatar{width:34px;height:34px;border-radius:50%;background:var(--sky-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+    .rank-row.is-me .rank-avatar{background:var(--navy);color:#fff;}
+    .rank-info{flex:1;min-width:0;}
+    .rank-name{font-size:13px;font-weight:600;color:var(--text);}
+    .rank-bar-bg{height:3px;background:var(--bg);border-radius:2px;margin-top:4px;}
+    .rank-bar-fill{height:3px;border-radius:2px;transition:width 0.5s ease;}
+    .rank-val{text-align:right;flex-shrink:0;}
+    .rank-val-num{font-size:15px;font-weight:700;}
+    .rank-val-unit{font-size:10px;color:var(--text-hint);}
+    .rank-empty{padding:2rem;text-align:center;color:var(--text-hint);font-size:13px;}
+    .rank-month-tag{text-align:center;padding:10px;font-size:11px;color:var(--text-hint);}
 
-    /* TABS */
-    .tabs { display: flex; background: var(--card); border-radius: 12px; padding: 4px; margin-bottom: 1rem; border: 1px solid var(--border); gap: 3px; }
-    .tab { flex: 1; padding: 7px 4px; font-size: 12px; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; background: none; color: var(--text-sub); font-family: inherit; }
-    .tab.active { background: var(--blue); color: white; }
+    /* ── QUIZ PAGE ── */
+    .quiz-status-card{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:16px;padding:1.25rem;margin-bottom:1.25rem;color:#fff;}
+    .qs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+    .qs-title{font-size:15px;font-weight:700;}
+    .qs-alive{font-size:12px;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;}
+    .quiz-card{background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:1.25rem;margin-bottom:1rem;}
+    .quiz-q-label{font-size:11px;font-weight:700;color:var(--text-hint);margin-bottom:8px;letter-spacing:0.5px;}
+    .quiz-q-text{font-size:16px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:6px;}
+    .quiz-q-hint{font-size:12px;color:var(--text-sub);margin-bottom:1rem;}
+    .quiz-q-by{font-size:11px;color:var(--text-hint);}
+    .quiz-answer-wrap{display:flex;gap:8px;margin-top:1rem;}
+    .quiz-answer-input{flex:1;padding:11px 14px;font-size:15px;font-family:inherit;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--bg);color:var(--text);}
+    .quiz-answer-input:focus{border-color:var(--sky);}
+    .btn-answer{padding:11px 20px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}
+    .quiz-elim-card{background:#fff5f5;border:1.5px solid #ffcccc;border-radius:16px;padding:1.5rem;text-align:center;}
+    .quiz-elim-icon{font-size:40px;margin-bottom:8px;}
+    .quiz-elim-title{font-size:16px;font-weight:700;color:var(--red);margin-bottom:4px;}
+    .quiz-elim-sub{font-size:13px;color:var(--text-sub);}
+    .quiz-register-card{background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:1.25rem;}
+    .quiz-register-title{font-size:14px;font-weight:700;margin-bottom:1rem;}
+    .q-field{margin-bottom:12px;}
+    .q-field label{display:block;font-size:12px;font-weight:600;color:var(--text-sub);margin-bottom:5px;}
+    .q-field input,.q-field textarea{width:100%;padding:10px 12px;font-size:14px;font-family:inherit;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--bg);color:var(--text);resize:none;}
+    .q-field input:focus,.q-field textarea:focus{border-color:var(--sky);}
+    .btn-register-quiz{width:100%;padding:12px;background:var(--sky);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px;}
 
-    /* RANKING */
-    .rank-list { background: var(--card); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
-    .rank-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
-    .rank-row:last-child { border-bottom: none; }
-    .rank-row.is-me { background: var(--blue-pale); }
-    .rank-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; background: var(--bg); color: var(--text-sub); }
-    .rank-num.r1 { background: var(--gold); color: #7a4a00; }
-    .rank-num.r2 { background: var(--silver); color: #444; }
-    .rank-num.r3 { background: var(--bronze); color: #6b2f1a; }
-    .rank-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--blue-light); color: var(--blue-dark); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-    .rank-row.is-me .rank-avatar { background: var(--blue); color: white; }
-    .rank-info { flex: 1; min-width: 0; }
-    .rank-name { font-size: 13px; font-weight: 500; color: var(--text); }
-    .rank-bar-bg { height: 3px; background: var(--bg); border-radius: 2px; margin-top: 4px; }
-    .rank-bar-fill { height: 3px; border-radius: 2px; }
-    .rank-val { text-align: right; flex-shrink: 0; }
-    .rank-val-num { font-size: 14px; font-weight: 700; }
-    .rank-val-unit { font-size: 10px; color: var(--text-hint); }
-    .rank-empty { padding: 1.5rem; text-align: center; color: var(--text-hint); font-size: 13px; }
-    .rank-month { text-align: center; padding: 8px; font-size: 11px; color: var(--text-hint); }
+    /* ── ADMIN PAGE ── */
+    .admin-section{margin-bottom:1.5rem;}
+    .pending-card{background:var(--card);border-radius:12px;border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
+    .pending-info{padding:12px 14px;}
+    .pending-title{font-size:13px;font-weight:600;color:var(--text);}
+    .pending-sub{font-size:11px;color:var(--text-sub);margin-top:2px;}
+    .pending-img{width:100%;max-height:200px;object-fit:cover;display:block;}
+    .pending-btns{display:flex;gap:8px;padding:10px 14px;}
+    .btn-approve{flex:1;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
+    .btn-reject{flex:1;padding:9px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;}
 
-    /* MODAL */
-    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: flex-end; justify-content: center; z-index: 200; }
-    .modal-bg.open { display: flex; }
-    .modal { background: var(--card); border-radius: 24px 24px 0 0; padding: 1.5rem; width: 100%; max-width: 480px; }
-    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 1.25rem; }
-    .water-btns { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
-    .water-btn { padding: 8px 14px; border: 1.5px solid var(--c-water); border-radius: 20px; background: none; color: var(--c-water); font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; }
-    .modal-input-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .modal-input { flex: 1; padding: 14px; font-size: 28px; font-weight: 700; font-family: inherit; border: 2px solid var(--border); border-radius: 12px; text-align: center; outline: none; color: var(--text); background: var(--bg); }
-    .modal-input:focus { border-color: var(--blue); }
-    .modal-unit { font-size: 16px; color: var(--text-sub); font-weight: 500; min-width: 36px; }
-    .modal-hint { font-size: 12px; color: var(--text-hint); margin-bottom: 1.25rem; }
-    .modal-btns { display: flex; gap: 8px; }
-    .btn-cancel { flex: 1; padding: 13px; border: 1.5px solid var(--border); border-radius: 10px; background: none; font-size: 14px; font-family: inherit; cursor: pointer; color: var(--text-sub); }
-    .btn-confirm { flex: 2; padding: 13px; background: var(--blue); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
+    /* ── MODAL ── */
+    .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-end;justify-content:center;z-index:200;}
+    .modal-bg.open{display:flex;}
+    .modal{background:var(--card);border-radius:24px 24px 0 0;padding:1.5rem;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;}
+    .modal-title{font-size:16px;font-weight:700;margin-bottom:1.25rem;}
+    .m-field{margin-bottom:12px;}
+    .m-field label{display:block;font-size:12px;font-weight:600;color:var(--text-sub);margin-bottom:5px;}
+    .m-field input,.m-field textarea{width:100%;padding:11px 12px;font-size:14px;font-family:inherit;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--bg);color:var(--text);}
+    .m-field input:focus,.m-field textarea:focus{border-color:var(--sky);}
+    .m-field textarea{resize:none;height:70px;}
+    .upload-btn{width:100%;padding:40px;border:2px dashed var(--border);border-radius:12px;background:var(--bg);cursor:pointer;text-align:center;color:var(--text-hint);font-size:13px;font-family:inherit;}
+    .upload-btn:hover{border-color:var(--sky);color:var(--sky);}
+    .upload-preview{width:100%;border-radius:12px;margin-top:8px;display:none;}
+    .modal-btns{display:flex;gap:8px;margin-top:1.25rem;}
+    .btn-cancel{flex:1;padding:13px;border:1.5px solid var(--border);border-radius:10px;background:none;font-size:14px;font-family:inherit;cursor:pointer;color:var(--text-sub);}
+    .btn-confirm{flex:2;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}
+    .step-preview{background:var(--bg);border-radius:10px;padding:10px;margin-bottom:10px;display:none;}
+    .step-preview img{width:100%;border-radius:8px;margin-bottom:8px;}
+    .step-hint{font-size:12px;color:var(--text-sub);text-align:center;}
 
-    /* BOTTOM NAV */
-    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 100; }
-    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 4px; font-family: inherit; color: var(--text-hint); }
-    .nav-btn.active { color: var(--blue); }
-    .nav-icon { font-size: 20px; }
-    .nav-label { font-size: 10px; font-weight: 500; }
+    /* ── GPS ── */
+    .gps-card{background:var(--bg);border-radius:10px;padding:12px;margin-bottom:12px;}
+    .gps-status{font-size:13px;color:var(--text-sub);display:flex;align-items:center;gap:6px;}
+    .gps-dot{width:8px;height:8px;border-radius:50%;background:var(--text-hint);}
+    .gps-dot.on{background:var(--green);animation:blink 1.5s infinite;}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+    .btn-gps{width:100%;padding:10px;background:var(--sky);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:8px;}
 
-    .save-toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 300; pointer-events: none; white-space: nowrap; }
-    .save-toast.show { opacity: 1; }
+    /* ── BOTTOM NAV ── */
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding:6px 0 max(6px,env(safe-area-inset-bottom));z-index:100;}
+    .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:4px;font-family:inherit;color:var(--text-hint);transition:color 0.15s;}
+    .nav-btn.active{color:var(--navy);}
+    .nav-icon{font-size:22px;}
+    .nav-label{font-size:10px;font-weight:600;}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity 0.3s;z-index:300;pointer-events:none;white-space:nowrap;}
+    .toast.show{opacity:1;}
+
+    .status-pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+    .status-pending{background:#fff3e0;color:#e65100;}
+    .status-approved{background:#e8f5e9;color:#1b5e20;}
+    .status-rejected{background:#ffebee;color:#b71c1c;}
+
+    input[type=file]{display:none;}
   </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ══ LOGIN ══ -->
 <div class="screen active" id="screen-login">
   <div class="login-card">
     <div class="login-logo">
-      <img src="logo.png" alt="CONTEC" />
-      <div class="app-name">건강 챌린지</div>
-      <div class="app-sub">CONTEC 임직원 전용 웰니스 프로그램</div>
+      <img src="logo.png" alt="CONTEC"/>
+      <div class="app-name">CONTEC 챌린지</div>
+      <div class="app-sub">임직원 전용 월간 챌린지 프로그램</div>
     </div>
     <div class="field">
       <label>이름</label>
-      <input type="text" id="inp-name" placeholder="홍길동" autocomplete="name" />
+      <input type="text" id="inp-name" placeholder="홍길동" autocomplete="name"/>
     </div>
     <div class="field">
       <label>접속 암호</label>
       <div class="pw-wrap">
-        <input type="password" id="inp-pw" placeholder="••••••••" autocomplete="current-password" />
+        <input type="password" id="inp-pw" placeholder="••••••••" autocomplete="current-password"/>
         <button class="pw-eye" id="btn-eye" type="button">보기</button>
       </div>
       <div class="error-msg" id="login-err"></div>
@@ -158,192 +226,256 @@
   </div>
 </div>
 
-<!-- MAIN -->
+<!-- ══ MAIN ══ -->
 <div class="screen" id="screen-main">
   <div class="topbar">
-    <img src="logo.png" alt="CONTEC" />
+    <img src="logo.png" alt="CONTEC"/>
     <div class="topbar-right">
       <div class="topbar-name"><strong id="disp-name"></strong>님</div>
       <button class="btn-logout" id="btn-logout">로그아웃</button>
     </div>
   </div>
 
-  <!-- 오늘 기록 페이지 -->
-  <div class="main-content" id="page-today">
-    <div class="today-header">
-      <div>
-        <div class="today-date" id="today-date"></div>
-        <div class="today-title">오늘의 건강 기록</div>
+  <!-- 홈 -->
+  <div class="page active" id="page-home">
+    <div class="month-banner">
+      <div class="mb-left">
+        <div class="mb-sub">이번 달 챌린지</div>
+        <div class="mb-title" id="mb-title">2025년 4월</div>
       </div>
-      <div class="today-badge" id="today-badge">0 / 4 완료</div>
+      <div class="mb-reset">매월 1일 리셋</div>
     </div>
-
-    <div class="section-title">항목 입력 (탭하여 수정)</div>
-    <div class="input-grid">
-      <div class="input-card" id="card-steps" onclick="openModal('steps')" style="--ic:#1B4F8E;">
-        <div class="ic-bar" style="background:var(--c-steps)"></div>
-        <div class="ic-icon">🚶</div>
-        <div class="ic-label">걸음 수</div>
-        <div class="ic-value" id="val-steps">0</div>
-        <div class="ic-unit">걸음</div>
-        <div class="ic-edit" style="color:var(--c-steps)">탭하여 입력</div>
+    <div class="sec-title">내 현황</div>
+    <div class="challenge-grid">
+      <div class="ch-card" onclick="switchPage('steps')">
+        <div class="ch-accent" style="background:#1B4F8E"></div>
+        <div class="ch-icon">🚶</div>
+        <div class="ch-label">걸음 수</div>
+        <div class="ch-value" id="home-steps">0</div>
+        <div class="ch-unit">이번 달 누적</div>
+        <div class="ch-action" style="color:#1B4F8E">기록하기 →</div>
       </div>
-      <div class="input-card" id="card-exercise" onclick="openModal('exercise')" style="--ic:#1D9E75;">
-        <div class="ic-bar" style="background:var(--c-exercise)"></div>
-        <div class="ic-icon">💪</div>
-        <div class="ic-label">운동 시간</div>
-        <div class="ic-value" id="val-exercise">0</div>
-        <div class="ic-unit">분</div>
-        <div class="ic-edit" style="color:var(--c-exercise)">탭하여 입력</div>
+      <div class="ch-card" onclick="switchPage('carpool')">
+        <div class="ch-accent" style="background:#1D9E75"></div>
+        <div class="ch-icon">🚗</div>
+        <div class="ch-label">카풀</div>
+        <div class="ch-value" id="home-carpool">0</div>
+        <div class="ch-unit">승인된 횟수</div>
+        <div class="ch-action" style="color:#1D9E75">인증하기 →</div>
       </div>
-      <div class="input-card" id="card-sleep" onclick="openModal('sleep')" style="--ic:#7B5EA7;">
-        <div class="ic-bar" style="background:var(--c-sleep)"></div>
-        <div class="ic-icon">😴</div>
-        <div class="ic-label">수면 시간</div>
-        <div class="ic-value" id="val-sleep">0</div>
-        <div class="ic-unit">시간</div>
-        <div class="ic-edit" style="color:var(--c-sleep)">탭하여 입력</div>
+      <div class="ch-card" onclick="switchPage('meal')">
+        <div class="ch-accent" style="background:#F07C2A"></div>
+        <div class="ch-icon">🍱</div>
+        <div class="ch-label">싹싹 식판</div>
+        <div class="ch-value" id="home-meal">0</div>
+        <div class="ch-unit">승인된 횟수</div>
+        <div class="ch-action" style="color:#F07C2A">인증하기 →</div>
       </div>
-      <div class="input-card" id="card-water" onclick="openModal('water')" style="--ic:#2196F3;">
-        <div class="ic-bar" style="background:var(--c-water)"></div>
-        <div class="ic-icon">💧</div>
-        <div class="ic-label">물 마시기</div>
-        <div class="ic-value" id="val-water">0</div>
-        <div class="ic-unit">잔 (200ml)</div>
-        <div class="ic-edit" style="color:var(--c-water)">탭하여 입력</div>
-      </div>
-    </div>
-
-    <button class="btn-save" id="btn-save">오늘 기록 저장하기</button>
-
-    <div class="section-title">이번 달 내 누적</div>
-    <div class="input-grid">
-      <div class="input-card" style="cursor:default;">
-        <div class="ic-icon">🚶</div>
-        <div class="ic-label">총 걸음 수</div>
-        <div class="ic-value" id="my-steps">-</div>
-        <div class="ic-unit">걸음</div>
-      </div>
-      <div class="input-card" style="cursor:default;">
-        <div class="ic-icon">💪</div>
-        <div class="ic-label">총 운동</div>
-        <div class="ic-value" id="my-exercise">-</div>
-        <div class="ic-unit">분</div>
-      </div>
-      <div class="input-card" style="cursor:default;">
-        <div class="ic-icon">😴</div>
-        <div class="ic-label">평균 수면</div>
-        <div class="ic-value" id="my-sleep">-</div>
-        <div class="ic-unit">시간</div>
-      </div>
-      <div class="input-card" style="cursor:default;">
-        <div class="ic-icon">💧</div>
-        <div class="ic-label">총 수분</div>
-        <div class="ic-value" id="my-water">-</div>
-        <div class="ic-unit">잔</div>
+      <div class="ch-card" onclick="switchPage('quiz')">
+        <div class="ch-accent" style="background:#7B5EA7"></div>
+        <div class="ch-icon">🚀</div>
+        <div class="ch-label">우주 퀴즈</div>
+        <div class="ch-value" id="home-quiz">생존</div>
+        <div class="ch-unit" id="home-quiz-sub">도전 중</div>
+        <div class="ch-action" style="color:#7B5EA7">참여하기 →</div>
       </div>
     </div>
   </div>
 
-  <!-- 랭킹 페이지 -->
-  <div class="main-content" id="page-ranking" style="display:none;">
-    <div class="tabs">
-      <button class="tab active" data-rank="steps">🚶 걸음</button>
-      <button class="tab" data-rank="exercise">💪 운동</button>
-      <button class="tab" data-rank="sleep">😴 수면</button>
-      <button class="tab" data-rank="water">💧 수분</button>
+  <!-- 걸음 수 -->
+  <div class="page" id="page-steps">
+    <div class="month-banner">
+      <div class="mb-left">
+        <div class="mb-sub">🚶 걸음 수 챌린지</div>
+        <div class="mb-title" id="steps-total">0 걸음</div>
+      </div>
+      <div class="mb-reset">이번 달 누적</div>
+    </div>
+    <div class="sec-title">걸음 수 추가</div>
+    <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:1.25rem;margin-bottom:1rem;">
+      <p style="font-size:13px;color:var(--text-sub);margin-bottom:1rem;">삼성헬스 또는 애플건강 스크린샷을 업로드하고 걸음 수를 입력하세요.</p>
+      <input type="file" id="steps-file" accept="image/*"/>
+      <button class="upload-btn" onclick="document.getElementById('steps-file').click()">📸 스크린샷 업로드</button>
+      <div class="step-preview" id="steps-preview">
+        <img id="steps-preview-img" src="" alt=""/>
+        <div class="step-hint">위 화면에서 걸음 수를 확인하여 아래에 입력하세요</div>
+      </div>
+      <div class="m-field" style="margin-top:12px;">
+        <label>오늘 걸음 수</label>
+        <input type="number" id="steps-input" placeholder="예: 8500" min="0"/>
+      </div>
+      <button style="width:100%;padding:12px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px;" onclick="submitSteps()">추가하기</button>
+    </div>
+    <div class="sec-title">이번 달 랭킹</div>
+    <div id="steps-ranking"></div>
+  </div>
+
+  <!-- 카풀 -->
+  <div class="page" id="page-carpool">
+    <div class="month-banner" style="background:linear-gradient(135deg,#0a4a2e,#1D9E75);">
+      <div class="mb-left">
+        <div class="mb-sub">🚗 카풀 챌린지</div>
+        <div class="mb-title" id="carpool-total">0회</div>
+      </div>
+      <div class="mb-reset">이번 달 승인</div>
+    </div>
+    <div class="sec-title">카풀 인증</div>
+    <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:1.25rem;margin-bottom:1rem;">
+      <div class="m-field">
+        <label>역할</label>
+        <select id="carpool-role" style="width:100%;padding:11px 12px;font-size:14px;font-family:inherit;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--bg);color:var(--text);">
+          <option value="driver">운전자 🚗</option>
+          <option value="passenger">동행자 🧑</option>
+        </select>
+      </div>
+      <div class="m-field" id="passenger-field">
+        <label>동행자 이름 (운전자인 경우)</label>
+        <input type="text" id="carpool-passenger" placeholder="예: 홍길동, 김철수"/>
+      </div>
+      <div class="m-field">
+        <label>출발지</label>
+        <input type="text" id="carpool-origin" placeholder="예: 서울 강남구"/>
+      </div>
+      <div class="m-field">
+        <label>도착지</label>
+        <input type="text" id="carpool-dest" placeholder="예: 대전 유성구 (CONTEC)"/>
+      </div>
+      <div class="m-field">
+        <label>인증샷</label>
+        <input type="file" id="carpool-file" accept="image/*"/>
+        <button class="upload-btn" onclick="document.getElementById('carpool-file').click()" id="carpool-upload-btn">📸 인증샷 업로드</button>
+        <img id="carpool-preview" class="upload-preview" src="" alt=""/>
+      </div>
+      <button style="width:100%;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:4px;" onclick="submitCarpool()">인증 신청</button>
+      <p style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:8px;">관리자 승인 후 점수에 반영됩니다</p>
+    </div>
+    <div class="sec-title">이번 달 랭킹</div>
+    <div id="carpool-ranking"></div>
+  </div>
+
+  <!-- 식판 -->
+  <div class="page" id="page-meal">
+    <div class="month-banner" style="background:linear-gradient(135deg,#7a3800,#F07C2A);">
+      <div class="mb-left">
+        <div class="mb-sub">🍱 싹싹 식판 챌린지</div>
+        <div class="mb-title" id="meal-total">0회</div>
+      </div>
+      <div class="mb-reset">이번 달 승인</div>
+    </div>
+    <div class="sec-title">식판 인증</div>
+    <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:1.25rem;margin-bottom:1rem;">
+      <p style="font-size:13px;color:var(--text-sub);margin-bottom:1rem;">깨끗하게 비운 식판 사진을 올려주세요! 🍽️</p>
+      <input type="file" id="meal-file" accept="image/*"/>
+      <button class="upload-btn" onclick="document.getElementById('meal-file').click()" id="meal-upload-btn">📸 식판 인증샷 업로드</button>
+      <img id="meal-preview" class="upload-preview" src="" alt=""/>
+      <button style="width:100%;padding:12px;background:#F07C2A;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:12px;" onclick="submitMeal()">인증 신청</button>
+      <p style="font-size:11px;color:var(--text-hint);text-align:center;margin-top:8px;">관리자 승인 후 점수에 반영됩니다</p>
+    </div>
+    <div class="sec-title">이번 달 랭킹</div>
+    <div id="meal-ranking"></div>
+  </div>
+
+  <!-- 퀴즈 -->
+  <div class="page" id="page-quiz">
+    <div class="quiz-status-card">
+      <div class="qs-top">
+        <div class="qs-title">🚀 우주 퀴즈 릴레이</div>
+        <div class="qs-alive">생존자 <span id="quiz-alive-count">-</span>명</div>
+      </div>
+      <div style="font-size:12px;opacity:0.7;">정답을 맞히면 다음 문제를 등록할 수 있어요.<br>틀리면 즉시 탈락! 마지막 생존자가 1위입니다.</div>
+    </div>
+    <div id="quiz-content"></div>
+  </div>
+
+  <!-- 랭킹 -->
+  <div class="page" id="page-ranking">
+    <div style="margin-bottom:1rem;">
+      <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:4px;">🏆 이번 달 랭킹</div>
+      <div style="font-size:12px;color:var(--text-hint);" id="ranking-ym"></div>
+    </div>
+    <div class="rank-tabs">
+      <button class="rank-tab active" data-rank="steps" onclick="switchRankTab(this,'steps')">🚶 걸음 수</button>
+      <button class="rank-tab" data-rank="carpool" onclick="switchRankTab(this,'carpool')">🚗 카풀</button>
+      <button class="rank-tab" data-rank="meal" onclick="switchRankTab(this,'meal')">🍱 식판</button>
+      <button class="rank-tab" data-rank="quiz" onclick="switchRankTab(this,'quiz')">🚀 퀴즈</button>
     </div>
     <div id="rank-content"><div class="rank-list"><div class="rank-empty">불러오는 중...</div></div></div>
   </div>
 
-  <div class="bottom-nav">
-    <button class="nav-btn active" id="nav-today" onclick="switchPage('today')">
-      <div class="nav-icon">📋</div>
-      <div class="nav-label">오늘 기록</div>
-    </button>
-    <button class="nav-btn" id="nav-ranking" onclick="switchPage('ranking')">
-      <div class="nav-icon">🏆</div>
-      <div class="nav-label">랭킹</div>
-    </button>
+  <!-- 관리자 -->
+  <div class="page" id="page-admin">
+    <div style="font-size:18px;font-weight:900;color:var(--navy);margin-bottom:1.25rem;">⚙️ 관리자</div>
+    <div class="admin-section">
+      <div class="sec-title">카풀 승인 대기 (<span id="carpool-pending-count">0</span>)</div>
+      <div id="carpool-pending-list"><div class="rank-empty" style="background:var(--card);border-radius:12px;border:1px solid var(--border);">대기 중인 항목이 없습니다</div></div>
+    </div>
+    <div class="admin-section">
+      <div class="sec-title">식판 승인 대기 (<span id="meal-pending-count">0</span>)</div>
+      <div id="meal-pending-list"><div class="rank-empty" style="background:var(--card);border-radius:12px;border:1px solid var(--border);">대기 중인 항목이 없습니다</div></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" onclick="switchPage('home')"><div class="nav-icon">🏠</div><div class="nav-label">홈</div></button>
+    <button class="nav-btn" onclick="switchPage('steps')"><div class="nav-icon">🚶</div><div class="nav-label">걸음</div></button>
+    <button class="nav-btn" onclick="switchPage('carpool')"><div class="nav-icon">🚗</div><div class="nav-label">카풀</div></button>
+    <button class="nav-btn" onclick="switchPage('meal')"><div class="nav-icon">🍱</div><div class="nav-label">식판</div></button>
+    <button class="nav-btn" onclick="switchPage('quiz')"><div class="nav-icon">🚀</div><div class="nav-label">퀴즈</div></button>
+    <button class="nav-btn" onclick="switchPage('ranking')"><div class="nav-icon">🏆</div><div class="nav-label">랭킹</div></button>
+    <button class="nav-btn" id="admin-nav-btn" style="display:none;" onclick="switchPage('admin')"><div class="nav-icon">⚙️</div><div class="nav-label">관리</div></button>
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-bg" id="modal-bg">
-  <div class="modal">
-    <div class="modal-title" id="modal-title"></div>
-    <div class="water-btns" id="water-btns" style="display:none;">
-      <button class="water-btn" onclick="addWater(1)">+1잔</button>
-      <button class="water-btn" onclick="addWater(2)">+2잔</button>
-      <button class="water-btn" onclick="addWater(4)">+4잔</button>
-      <button class="water-btn" onclick="addWater(8)">+8잔</button>
-    </div>
-    <div class="modal-input-wrap">
-      <input type="number" class="modal-input" id="modal-input" min="0" />
-      <div class="modal-unit" id="modal-unit"></div>
-    </div>
-    <div class="modal-hint" id="modal-hint"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">취소</button>
-      <button class="btn-confirm" onclick="confirmModal()">확인</button>
-    </div>
-  </div>
-</div>
-
-<div class="save-toast" id="save-toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
+// ═══════════════════════════════════════
+//  설정
+// ═══════════════════════════════════════
 const CONFIG = {
   password: 'contec2024',
+  adminName: '이슬',  // ← 관리자 이름
   supabaseUrl: 'https://ifytanvhskqmbvmjoohi.supabase.co',
   supabaseKey: 'sb_publishable_jRme4n_S6tw5U3HBmv4Rgw_hKOfDXIy',
 };
 
-const CATS = {
-  steps:    { label:'걸음 수',   unit:'걸음', color:'#1B4F8E', hint:'삼성헬스/애플건강에서 확인 후 입력하세요' },
-  exercise: { label:'운동 시간', unit:'분',   color:'#1D9E75', hint:'오늘 운동한 총 시간 (유산소+근력 합산)' },
-  sleep:    { label:'수면 시간', unit:'시간', color:'#7B5EA7', hint:'어젯밤 수면 시간을 입력하세요' },
-  water:    { label:'물 마시기', unit:'잔',   color:'#2196F3', hint:'오늘 마신 물 잔 수 (1잔=200ml)' },
-};
-
 const SB = {
   h: { 'Content-Type':'application/json', 'apikey':CONFIG.supabaseKey, 'Authorization':'Bearer '+CONFIG.supabaseKey },
-  async get(name, date) {
-    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?name=eq.'+encodeURIComponent(name)+'&date=eq.'+date, {headers:this.h});
-    if(!r.ok) return null;
-    const d = await r.json(); return d[0]||null;
-  },
-  async upsert(name, date, data) {
-    const ex = await this.get(name, date);
-    const ym = date.slice(0,7);
-    if(ex) {
-      await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?id=eq.'+ex.id, {method:'PATCH', headers:{...this.h,'Prefer':'return=minimal'}, body:JSON.stringify({...data, updated_at:new Date().toISOString()})});
-    } else {
-      await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records', {method:'POST', headers:{...this.h,'Prefer':'return=minimal'}, body:JSON.stringify({name, date, year_month:ym, ...data})});
-    }
-  },
-  async ranking(ym, cat) {
-    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?year_month=eq.'+ym+'&select=name,'+cat, {headers:this.h});
-    if(!r.ok) return [];
-    const rows = await r.json();
-    const map = {};
-    rows.forEach(row => { if(!map[row.name]) map[row.name]={sum:0,cnt:0}; map[row.name].sum+=(row[cat]||0); map[row.name].cnt++; });
-    return Object.entries(map).map(([name,v])=>({name,val:v.sum,cnt:v.cnt})).sort((a,b)=>b.val-a.val);
-  },
-  async monthly(name, ym) {
-    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?name=eq.'+encodeURIComponent(name)+'&year_month=eq.'+ym, {headers:this.h});
+
+  async get(table, query='') {
+    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table+'?'+query, {headers:this.h});
     return r.ok ? r.json() : [];
+  },
+  async post(table, data) {
+    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table, {method:'POST', headers:{...this.h,'Prefer':'return=minimal'}, body:JSON.stringify(data)});
+    return r.ok;
+  },
+  async patch(table, id, data) {
+    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table+'?id=eq.'+id, {method:'PATCH', headers:{...this.h,'Prefer':'return=minimal'}, body:JSON.stringify(data)});
+    return r.ok;
+  },
+  async upload(file) {
+    const ext = file.name.split('.').pop();
+    const path = Date.now()+'.'+ext;
+    const r = await fetch(CONFIG.supabaseUrl+'/storage/v1/object/challenge-images/'+path, {
+      method:'POST',
+      headers:{'apikey':CONFIG.supabaseKey,'Authorization':'Bearer '+CONFIG.supabaseKey,'Content-Type':file.type},
+      body:file
+    });
+    if(!r.ok) return null;
+    return CONFIG.supabaseUrl+'/storage/v1/object/public/challenge-images/'+path;
   }
 };
 
-const app = { name:'', today:{steps:0,exercise:0,sleep:0,water:0} };
-let modalCat = '';
-
-function getToday() { return new Date().toISOString().slice(0,10); }
 function getYM() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function getYMLabel() { const d=new Date(); return d.getFullYear()+'년 '+(d.getMonth()+1)+'월'; }
 
-// LOGIN
-document.getElementById('btn-eye').addEventListener('click', function() {
+const app = { name:'', isAdmin:false };
+
+// ═══════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════
+document.getElementById('btn-eye').addEventListener('click', function(){
   const i=document.getElementById('inp-pw');
   i.type=i.type==='password'?'text':'password';
   this.textContent=i.type==='password'?'보기':'숨기기';
@@ -353,177 +485,432 @@ async function doLogin() {
   const name=document.getElementById('inp-name').value.trim();
   const pw=document.getElementById('inp-pw').value;
   const err=document.getElementById('login-err');
-  if(!name){showErr(err,'이름을 입력해주세요');return;}
-  if(pw!==CONFIG.password){showErr(err,'암호가 올바르지 않습니다');return;}
+  if(!name){err.textContent='이름을 입력해주세요';err.style.display='block';return;}
+  if(pw!==CONFIG.password){err.textContent='암호가 올바르지 않습니다';err.style.display='block';return;}
   err.style.display='none';
   app.name=name;
+  app.isAdmin=(name===CONFIG.adminName);
+  localStorage.setItem('contec_session',JSON.stringify({name}));
   document.getElementById('disp-name').textContent=name;
-  const d=new Date();
-  document.getElementById('today-date').textContent=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+['일','월','화','수','목','금','토'][d.getDay()]+'요일';
-  // 세션 저장 (자동 로그인용)
-  localStorage.setItem('contec_session', JSON.stringify({ name, savedAt: Date.now() }));
-
+  document.getElementById('mb-title').textContent=getYMLabel();
+  document.getElementById('ranking-ym').textContent=getYMLabel()+' 기준';
+  if(app.isAdmin) document.getElementById('admin-nav-btn').style.display='flex';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-main').classList.add('active');
-  loadToday();
-  loadMonthly();
+  loadHomeData();
 }
 
 document.getElementById('btn-login').addEventListener('click', doLogin);
 document.getElementById('inp-pw').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin();});
 document.getElementById('inp-name').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('inp-pw').focus();});
-function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 
 document.getElementById('btn-logout').addEventListener('click', ()=>{
   localStorage.removeItem('contec_session');
-  localStorage.removeItem('contec_h');
-  app.name=''; app.today={steps:0,exercise:0,sleep:0,water:0};
+  app.name=''; app.isAdmin=false;
   document.getElementById('inp-pw').value='';
-  document.getElementById('inp-name').value='';
+  document.getElementById('admin-nav-btn').style.display='none';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-login').classList.add('active');
 });
 
-// DATA
-async function loadToday() {
+// AUTO LOGIN
+(function(){
   try {
-    const cached=JSON.parse(localStorage.getItem('contec_h')||'{}');
-    if(cached.date===getToday()&&cached.name===app.name){app.today=cached.data;updateTodayUI();}
-    const rec=await SB.get(app.name,getToday());
-    if(rec){app.today={steps:rec.steps||0,exercise:rec.exercise||0,sleep:rec.sleep||0,water:rec.water||0};updateTodayUI();saveCache();}
+    const s=JSON.parse(localStorage.getItem('contec_session')||'null');
+    if(s&&s.name){
+      document.getElementById('inp-name').value=s.name;
+      document.getElementById('inp-pw').value=CONFIG.password;
+      doLogin();
+    }
   } catch(e){}
-}
+})();
 
-async function loadMonthly() {
-  try {
-    const rows=await SB.monthly(app.name,getYM());
-    let steps=0,exercise=0,sleep=0,water=0,sleepDays=0;
-    rows.forEach(r=>{steps+=r.steps||0;exercise+=r.exercise||0;water+=r.water||0;if(r.sleep>0){sleep+=r.sleep;sleepDays++;}});
-    document.getElementById('my-steps').textContent=steps.toLocaleString('ko-KR');
-    document.getElementById('my-exercise').textContent=exercise;
-    document.getElementById('my-sleep').textContent=sleepDays>0?(sleep/sleepDays).toFixed(1):0;
-    document.getElementById('my-water').textContent=water;
-  } catch(e){}
-}
-
-function saveCache() {
-  localStorage.setItem('contec_h',JSON.stringify({date:getToday(),name:app.name,data:app.today}));
-}
-
-function updateTodayUI() {
-  ['steps','exercise','sleep','water'].forEach(cat=>{
-    const v=app.today[cat];
-    document.getElementById('val-'+cat).textContent=cat==='steps'?v.toLocaleString('ko-KR'):v;
-    document.getElementById('card-'+cat).classList.toggle('done',v>0);
-  });
-  const done=Object.values(app.today).filter(v=>v>0).length;
-  document.getElementById('today-badge').textContent=done+' / 4 완료';
-}
-
-// SAVE
-document.getElementById('btn-save').addEventListener('click', async ()=>{
-  const btn=document.getElementById('btn-save');
-  btn.disabled=true; btn.textContent='저장 중...';
-  try {
-    await SB.upsert(app.name,getToday(),app.today);
-    saveCache(); loadMonthly();
-    showToast('✅ 오늘 기록이 저장되었습니다!');
-  } catch(e){ showToast('❌ 저장 실패. 다시 시도해주세요.'); }
-  btn.disabled=false; btn.textContent='오늘 기록 저장하기';
-});
-
-function showToast(msg) {
-  const t=document.getElementById('save-toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
-}
-
-// MODAL
-function openModal(cat) {
-  modalCat=cat;
-  const info=CATS[cat];
-  document.getElementById('modal-title').textContent=info.label+' 입력';
-  document.getElementById('modal-unit').textContent=info.unit;
-  document.getElementById('modal-hint').textContent=info.hint;
-  document.getElementById('modal-input').value=app.today[cat]||'';
-  document.getElementById('water-btns').style.display=cat==='water'?'flex':'none';
-  document.getElementById('modal-bg').classList.add('open');
-  setTimeout(()=>document.getElementById('modal-input').focus(),100);
-}
-function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
-function confirmModal(){
-  const v=parseFloat(document.getElementById('modal-input').value)||0;
-  app.today[modalCat]=v; updateTodayUI(); closeModal();
-}
-function addWater(n){
-  const v=parseFloat(document.getElementById('modal-input').value)||0;
-  document.getElementById('modal-input').value=v+n;
-}
-document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
-
-// PAGE SWITCH
+// ═══════════════════════════════════════
+//  PAGE SWITCH
+// ═══════════════════════════════════════
 function switchPage(page) {
-  document.getElementById('page-today').style.display=page==='today'?'block':'none';
-  document.getElementById('page-ranking').style.display=page==='ranking'?'block':'none';
-  document.getElementById('nav-today').classList.toggle('active',page==='today');
-  document.getElementById('nav-ranking').classList.toggle('active',page==='ranking');
-  if(page==='ranking') loadRanking('steps');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+page+"'")) b.classList.add('active');
+  });
+  if(page==='ranking') loadRankingPage('steps');
+  if(page==='steps') loadStepsRanking();
+  if(page==='carpool') loadCarpoolRanking();
+  if(page==='meal') loadMealRanking();
+  if(page==='quiz') loadQuizPage();
+  if(page==='admin') loadAdminPage();
 }
 
-// RANKING
-document.querySelectorAll('.tab[data-rank]').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.tab[data-rank]').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    loadRanking(tab.dataset.rank);
-  });
+// ═══════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════
+async function loadHomeData() {
+  const ym=getYM();
+  try {
+    // 걸음
+    const sr=await SB.get('steps','name=eq.'+encodeURIComponent(app.name)+'&year_month=eq.'+ym);
+    document.getElementById('home-steps').textContent=(sr[0]?.steps||0).toLocaleString('ko-KR');
+    document.getElementById('steps-total').textContent=((sr[0]?.steps||0)).toLocaleString('ko-KR')+' 걸음';
+    // 카풀
+    const cr=await SB.get('carpools','year_month=eq.'+ym+'&status=eq.approved&or=(driver.eq.'+encodeURIComponent(app.name)+',passenger.ilike.*'+encodeURIComponent(app.name)+'*)');
+    document.getElementById('home-carpool').textContent=cr.length;
+    document.getElementById('carpool-total').textContent=cr.length+'회';
+    // 식판
+    const mr=await SB.get('meal_certs','name=eq.'+encodeURIComponent(app.name)+'&year_month=eq.'+ym+'&status=eq.approved');
+    document.getElementById('home-meal').textContent=mr.length;
+    document.getElementById('meal-total').textContent=mr.length+'회';
+    // 퀴즈
+    const eliminated=await SB.get('quiz_attempts','name=eq.'+encodeURIComponent(app.name)+'&year_month=eq.'+ym+'&is_correct=eq.false');
+    if(eliminated.length>0){
+      document.getElementById('home-quiz').textContent='탈락';
+      document.getElementById('home-quiz-sub').style.color='var(--red)';
+      document.getElementById('home-quiz-sub').textContent='이번 달 탈락';
+    }
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════
+//  STEPS
+// ═══════════════════════════════════════
+document.getElementById('steps-file').addEventListener('change', function(){
+  if(!this.files[0]) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('steps-preview-img').src=e.target.result;
+    document.getElementById('steps-preview').style.display='block';
+  };
+  reader.readAsDataURL(this.files[0]);
 });
 
-async function loadRanking(cat) {
-  const el=document.getElementById('rank-content');
-  const info=CATS[cat];
-  el.innerHTML='<div class="rank-list"><div class="rank-empty">불러오는 중...</div></div>';
-  try {
-    const list=await SB.ranking(getYM(),cat);
-    if(!list.length){el.innerHTML='<div class="rank-list"><div class="rank-empty">이번 달 기록이 없습니다</div></div>';return;}
-    const max=list[0]?.val||1;
-    const [y,m]=getYM().split('-');
-    el.innerHTML='<div class="rank-list">'+list.map((r,i)=>{
-      const rank=i+1, isMe=r.name===app.name;
-      const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
-      const pct=Math.round(r.val/max*100);
-      const disp=cat==='sleep'?(r.val/r.cnt).toFixed(1):r.val.toLocaleString('ko-KR');
-      const unitLabel=cat==='sleep'?'시간 평균':info.unit;
-      return `<div class="rank-row ${isMe?'is-me':''}">
-        <div class="rank-num ${rank<=3?'r'+rank:''}">${typeof medal==='string'?medal:rank}</div>
-        <div class="rank-avatar">${r.name.slice(0,1)}○</div>
-        <div class="rank-info">
-          <div class="rank-name">${r.name}${isMe?' (나)':''}</div>
-          <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%;background:${info.color}"></div></div>
-        </div>
-        <div class="rank-val">
-          <div class="rank-val-num" style="color:${info.color}">${disp}</div>
-          <div class="rank-val-unit">${unitLabel}</div>
+async function submitSteps() {
+  const val=parseInt(document.getElementById('steps-input').value)||0;
+  if(val<=0){showToast('❌ 걸음 수를 입력해주세요');return;}
+  const ym=getYM();
+  const existing=await SB.get('steps','name=eq.'+encodeURIComponent(app.name)+'&year_month=eq.'+ym);
+  let ok;
+  if(existing[0]) {
+    const newTotal=(existing[0].steps||0)+val;
+    ok=await SB.patch('steps',existing[0].id,{steps:newTotal,updated_at:new Date().toISOString()});
+  } else {
+    ok=await SB.post('steps',{name:app.name,year_month:ym,steps:val});
+  }
+  if(ok){
+    showToast('✅ '+val.toLocaleString('ko-KR')+'걸음 추가!');
+    document.getElementById('steps-input').value='';
+    document.getElementById('steps-preview').style.display='none';
+    loadHomeData(); loadStepsRanking();
+  } else { showToast('❌ 저장 실패'); }
+}
+
+async function loadStepsRanking() {
+  const el=document.getElementById('steps-ranking');
+  const list=await SB.get('steps','year_month=eq.'+getYM()+'&order=steps.desc');
+  renderRankList(el,list.map(r=>({name:r.name,val:r.steps})),'걸음','#1B4F8E',true);
+}
+
+// ═══════════════════════════════════════
+//  CARPOOL
+// ═══════════════════════════════════════
+document.getElementById('carpool-file').addEventListener('change', function(){
+  previewFile(this,'carpool-preview','carpool-upload-btn');
+});
+document.getElementById('carpool-role').addEventListener('change', function(){
+  document.getElementById('passenger-field').style.display=this.value==='driver'?'block':'none';
+});
+
+async function submitCarpool() {
+  const role=document.getElementById('carpool-role').value;
+  const passenger=document.getElementById('carpool-passenger').value.trim();
+  const origin=document.getElementById('carpool-origin').value.trim();
+  const dest=document.getElementById('carpool-dest').value.trim();
+  const file=document.getElementById('carpool-file').files[0];
+  if(!origin||!dest){showToast('❌ 출발지와 도착지를 입력해주세요');return;}
+  if(!file){showToast('❌ 인증샷을 업로드해주세요');return;}
+  showToast('📤 업로드 중...');
+  const imgUrl=await SB.upload(file);
+  if(!imgUrl){showToast('❌ 이미지 업로드 실패');return;}
+  const driver=role==='driver'?app.name:'';
+  const passengerName=role==='driver'?passenger:app.name;
+  const driverName=role==='passenger'?passenger:app.name;
+  const ok=await SB.post('carpools',{year_month:getYM(),driver:driverName,passenger:passengerName,origin,destination:dest,image_url:imgUrl,status:'pending'});
+  if(ok){
+    showToast('✅ 카풀 인증 신청 완료! 관리자 승인을 기다려주세요');
+    document.getElementById('carpool-origin').value='';
+    document.getElementById('carpool-dest').value='';
+    document.getElementById('carpool-passenger').value='';
+    document.getElementById('carpool-preview').style.display='none';
+    loadCarpoolRanking();
+  } else { showToast('❌ 신청 실패'); }
+}
+
+async function loadCarpoolRanking() {
+  const el=document.getElementById('carpool-ranking');
+  const rows=await SB.get('carpools','year_month=eq.'+getYM()+'&status=eq.approved');
+  const map={};
+  rows.forEach(r=>{
+    [r.driver,r.passenger].forEach(n=>{ if(n){if(!map[n])map[n]=0; map[n]++;} });
+  });
+  const list=Object.entries(map).map(([name,val])=>({name,val})).sort((a,b)=>b.val-a.val);
+  renderRankList(el,list,'회','#1D9E75');
+}
+
+// ═══════════════════════════════════════
+//  MEAL
+// ═══════════════════════════════════════
+document.getElementById('meal-file').addEventListener('change', function(){
+  previewFile(this,'meal-preview','meal-upload-btn');
+});
+
+async function submitMeal() {
+  const file=document.getElementById('meal-file').files[0];
+  if(!file){showToast('❌ 식판 인증샷을 업로드해주세요');return;}
+  showToast('📤 업로드 중...');
+  const imgUrl=await SB.upload(file);
+  if(!imgUrl){showToast('❌ 이미지 업로드 실패');return;}
+  const ok=await SB.post('meal_certs',{name:app.name,year_month:getYM(),image_url:imgUrl,status:'pending'});
+  if(ok){
+    showToast('✅ 식판 인증 신청 완료! 관리자 승인을 기다려주세요');
+    document.getElementById('meal-preview').style.display='none';
+    loadMealRanking();
+  } else { showToast('❌ 신청 실패'); }
+}
+
+async function loadMealRanking() {
+  const el=document.getElementById('meal-ranking');
+  const rows=await SB.get('meal_certs','year_month=eq.'+getYM()+'&status=eq.approved&order=name.asc');
+  const map={};
+  rows.forEach(r=>{ if(!map[r.name])map[r.name]=0; map[r.name]++; });
+  const list=Object.entries(map).map(([name,val])=>({name,val})).sort((a,b)=>b.val-a.val);
+  renderRankList(el,list,'회','#F07C2A');
+}
+
+// ═══════════════════════════════════════
+//  QUIZ
+// ═══════════════════════════════════════
+async function loadQuizPage() {
+  const el=document.getElementById('quiz-content');
+  const ym=getYM();
+  // 탈락 여부 확인
+  const elim=await SB.get('quiz_attempts','name=eq.'+encodeURIComponent(app.name)+'&year_month=eq.'+ym+'&is_correct=eq.false');
+  // 생존자 수
+  const allAttempts=await SB.get('quiz_attempts','year_month=eq.'+ym);
+  const eliminated=new Set(allAttempts.filter(a=>!a.is_correct).map(a=>a.name));
+  const allParticipants=new Set(allAttempts.map(a=>a.name));
+  const aliveCount=Math.max(0,[...allParticipants].filter(n=>!eliminated.has(n)).length);
+  document.getElementById('quiz-alive-count').textContent=aliveCount;
+
+  if(elim.length>0) {
+    el.innerHTML=`<div class="quiz-elim-card">
+      <div class="quiz-elim-icon">💥</div>
+      <div class="quiz-elim-title">이번 달 탈락!</div>
+      <div class="quiz-elim-sub">다음 달 챌린지에서 다시 도전하세요</div>
+    </div>`;
+    return;
+  }
+
+  // 현재 활성 퀴즈
+  const quizzes=await SB.get('quiz_relay','year_month=eq.'+ym+'&is_active=eq.true&order=created_at.desc&limit=1');
+  const quiz=quizzes[0];
+
+  // 내가 이미 이 퀴즈에 정답 맞혔는지
+  let alreadyAnswered=false;
+  if(quiz){
+    const myAnswers=await SB.get('quiz_attempts','name=eq.'+encodeURIComponent(app.name)+'&quiz_id=eq.'+quiz.id+'&is_correct=eq.true');
+    alreadyAnswered=myAnswers.length>0;
+  }
+
+  let html='';
+
+  if(quiz) {
+    html+=`<div class="quiz-card">
+      <div class="quiz-q-label">현재 문제 · ${quiz.created_by}님 출제</div>
+      <div class="quiz-q-text">${quiz.question}</div>
+      ${quiz.hint?`<div class="quiz-q-hint">힌트: ${quiz.hint}</div>`:''}
+    </div>`;
+
+    if(alreadyAnswered) {
+      html+=`<div style="background:#e8f5e9;border:1.5px solid #a5d6a7;border-radius:16px;padding:1.25rem;text-align:center;margin-bottom:1rem;">
+        <div style="font-size:28px;margin-bottom:8px;">✅</div>
+        <div style="font-size:14px;font-weight:700;color:#1b5e20;">정답! 다음 문제를 등록해주세요</div>
+      </div>`;
+    } else {
+      html+=`<div class="quiz-card">
+        <div class="quiz-q-label">정답 입력</div>
+        <div class="quiz-answer-wrap">
+          <input type="text" class="quiz-answer-input" id="quiz-ans-input" placeholder="정답을 입력하세요"/>
+          <button class="btn-answer" onclick="submitQuizAnswer('${quiz.id}','${quiz.answer}')">제출</button>
         </div>
       </div>`;
-    }).join('')+`<div class="rank-month">${y}년 ${m}월 누적 랭킹</div></div>`;
-  } catch(e){
-    el.innerHTML='<div class="rank-list"><div class="rank-empty">랭킹을 불러올 수 없습니다</div></div>';
+    }
+  } else {
+    html+=`<div class="quiz-card" style="text-align:center;padding:2rem;">
+      <div style="font-size:32px;margin-bottom:8px;">🚀</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px;">아직 문제가 없어요!</div>
+      <div style="font-size:12px;color:var(--text-hint);">첫 문제를 등록해보세요</div>
+    </div>`;
+  }
+
+  if(!quiz || alreadyAnswered) {
+    html+=`<div class="quiz-register-card">
+      <div class="quiz-register-title">📝 다음 문제 등록</div>
+      <div class="q-field"><label>문제</label><textarea id="q-question" placeholder="우주/위성 관련 퀴즈를 출제해보세요!"></textarea></div>
+      <div class="q-field"><label>정답 (정확히 입력)</label><input type="text" id="q-answer" placeholder="예: 아르테미스"/></div>
+      <div class="q-field"><label>힌트 (선택)</label><input type="text" id="q-hint" placeholder="예: NASA의 달 탐사 프로그램"/></div>
+      <button class="btn-register-quiz" onclick="registerQuiz()">문제 등록하기</button>
+    </div>`;
+  }
+  el.innerHTML=html;
+}
+
+async function submitQuizAnswer(quizId, correctAnswer) {
+  const ans=document.getElementById('quiz-ans-input').value.trim();
+  if(!ans){showToast('❌ 정답을 입력해주세요');return;}
+  const isCorrect=ans.replace(/\s/g,'').toLowerCase()===correctAnswer.replace(/\s/g,'').toLowerCase();
+  await SB.post('quiz_attempts',{year_month:getYM(),name:app.name,quiz_id:quizId,is_correct:isCorrect,eliminated_at:isCorrect?null:new Date().toISOString()});
+  if(isCorrect){showToast('🎉 정답입니다!');} else {showToast('💥 틀렸습니다! 탈락...');}
+  setTimeout(()=>loadQuizPage(),1000);
+}
+
+async function registerQuiz() {
+  const question=document.getElementById('q-question').value.trim();
+  const answer=document.getElementById('q-answer').value.trim();
+  const hint=document.getElementById('q-hint').value.trim();
+  if(!question||!answer){showToast('❌ 문제와 정답을 입력해주세요');return;}
+  const ok=await SB.post('quiz_relay',{year_month:getYM(),question,answer,hint,created_by:app.name,is_active:true});
+  if(ok){showToast('✅ 문제 등록 완료!');loadQuizPage();} else {showToast('❌ 등록 실패');}
+}
+
+// ═══════════════════════════════════════
+//  RANKING PAGE
+// ═══════════════════════════════════════
+async function switchRankTab(btn, type) {
+  document.querySelectorAll('.rank-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  loadRankingPage(type);
+}
+
+async function loadRankingPage(type) {
+  const el=document.getElementById('rank-content');
+  el.innerHTML='<div class="rank-list"><div class="rank-empty">불러오는 중...</div></div>';
+  const ym=getYM();
+  let list=[], unit='', color='';
+
+  if(type==='steps'){
+    const rows=await SB.get('steps','year_month=eq.'+ym+'&order=steps.desc');
+    list=rows.map(r=>({name:r.name,val:r.steps})); unit='걸음'; color='#1B4F8E';
+  } else if(type==='carpool'){
+    const rows=await SB.get('carpools','year_month=eq.'+ym+'&status=eq.approved');
+    const map={}; rows.forEach(r=>{[r.driver,r.passenger].forEach(n=>{if(n){if(!map[n])map[n]=0;map[n]++;}});});
+    list=Object.entries(map).map(([name,val])=>({name,val})).sort((a,b)=>b.val-a.val); unit='회'; color='#1D9E75';
+  } else if(type==='meal'){
+    const rows=await SB.get('meal_certs','year_month=eq.'+ym+'&status=eq.approved');
+    const map={}; rows.forEach(r=>{if(!map[r.name])map[r.name]=0;map[r.name]++;});
+    list=Object.entries(map).map(([name,val])=>({name,val})).sort((a,b)=>b.val-a.val); unit='회'; color='#F07C2A';
+  } else if(type==='quiz'){
+    const attempts=await SB.get('quiz_attempts','year_month=eq.'+ym+'&order=eliminated_at.desc.nullsfirst');
+    const seen=new Set(); const order=[];
+    attempts.forEach(a=>{if(!seen.has(a.name)){seen.add(a.name);order.push({name:a.name,eliminated:!a.is_correct||!!a.eliminated_at});}});
+    // 생존자 먼저, 탈락자 나중
+    const alive=order.filter(o=>!o.eliminated);
+    const dead=order.filter(o=>o.eliminated);
+    list=[...alive,...dead].map((o,i)=>({name:o.name,val:o.eliminated?0:alive.length-i,label:o.eliminated?'탈락':'생존'}));
+    unit=''; color='#7B5EA7';
+  }
+  renderRankList(el,list,unit,color);
+}
+
+// ═══════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════
+async function loadAdminPage() {
+  if(!app.isAdmin) return;
+  const ym=getYM();
+  // 카풀 대기
+  const cp=await SB.get('carpools','year_month=eq.'+ym+'&status=eq.pending&order=created_at.asc');
+  document.getElementById('carpool-pending-count').textContent=cp.length;
+  const cpEl=document.getElementById('carpool-pending-list');
+  if(!cp.length){cpEl.innerHTML='<div class="rank-empty" style="background:var(--card);border-radius:12px;border:1px solid var(--border);">대기 중인 항목이 없습니다</div>';} else {
+    cpEl.innerHTML=cp.map(r=>`<div class="pending-card">
+      <div class="pending-info">
+        <div class="pending-title">🚗 ${r.driver} → ${r.passenger}</div>
+        <div class="pending-sub">${r.origin} → ${r.destination}</div>
+      </div>
+      ${r.image_url?`<img class="pending-img" src="${r.image_url}" alt="인증샷"/>`:''}
+      <div class="pending-btns">
+        <button class="btn-approve" onclick="approveItem('carpools','${r.id}',true)">✅ 승인</button>
+        <button class="btn-reject" onclick="approveItem('carpools','${r.id}',false)">❌ 거절</button>
+      </div>
+    </div>`).join('');
+  }
+  // 식판 대기
+  const ml=await SB.get('meal_certs','year_month=eq.'+ym+'&status=eq.pending&order=created_at.asc');
+  document.getElementById('meal-pending-count').textContent=ml.length;
+  const mlEl=document.getElementById('meal-pending-list');
+  if(!ml.length){mlEl.innerHTML='<div class="rank-empty" style="background:var(--card);border-radius:12px;border:1px solid var(--border);">대기 중인 항목이 없습니다</div>';} else {
+    mlEl.innerHTML=ml.map(r=>`<div class="pending-card">
+      <div class="pending-info">
+        <div class="pending-title">🍱 ${r.name}</div>
+        <div class="pending-sub">${new Date(r.created_at).toLocaleDateString('ko-KR')} 신청</div>
+      </div>
+      ${r.image_url?`<img class="pending-img" src="${r.image_url}" alt="인증샷"/>`:''}
+      <div class="pending-btns">
+        <button class="btn-approve" onclick="approveItem('meal_certs','${r.id}',true)">✅ 승인</button>
+        <button class="btn-reject" onclick="approveItem('meal_certs','${r.id}',false)">❌ 거절</button>
+      </div>
+    </div>`).join('');
   }
 }
 
-// ═══ 자동 로그인 ═══
-(function() {
-  try {
-    const session = JSON.parse(localStorage.getItem('contec_session') || 'null');
-    if (session && session.name) {
-      // 저장된 세션이 있으면 자동 로그인
-      document.getElementById('inp-name').value = session.name;
-      document.getElementById('inp-pw').value = CONFIG.password;
-      doLogin();
-    }
-  } catch(e) {}
-})();
+async function approveItem(table, id, approve) {
+  await SB.patch(table,id,{status:approve?'approved':'rejected'});
+  showToast(approve?'✅ 승인 완료':'❌ 거절 완료');
+  loadAdminPage(); loadHomeData();
+}
+
+// ═══════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════
+function renderRankList(el, list, unit, color, localeNum=false) {
+  if(!list.length){el.innerHTML='<div class="rank-list"><div class="rank-empty">이번 달 기록이 없습니다</div></div>';return;}
+  const max=list[0]?.val||1;
+  const [y,m]=getYM().split('-');
+  el.innerHTML='<div class="rank-list">'+list.map((r,i)=>{
+    const rank=i+1,isMe=r.name===app.name;
+    const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+    const pct=max>0?Math.round(r.val/max*100):0;
+    const disp=r.label||(localeNum?r.val.toLocaleString('ko-KR'):r.val);
+    return `<div class="rank-row ${isMe?'is-me':''}">
+      <div class="rank-num ${rank<=3?'r'+rank:''}">${typeof medal==='string'?medal:rank}</div>
+      <div class="rank-avatar">${r.name.slice(0,1)}○</div>
+      <div class="rank-info">
+        <div class="rank-name">${r.name}${isMe?' (나)':''}</div>
+        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+      <div class="rank-val">
+        <div class="rank-val-num" style="color:${color}">${disp}</div>
+        <div class="rank-val-unit">${unit}</div>
+      </div>
+    </div>`;
+  }).join('')+`<div class="rank-month-tag">${y}년 ${m}월 랭킹</div></div>`;
+}
+
+function previewFile(input, previewId, btnId) {
+  if(!input.files[0]) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById(previewId);
+    img.src=e.target.result; img.style.display='block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
 
 if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
