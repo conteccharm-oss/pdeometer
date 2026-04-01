@@ -41,7 +41,7 @@
     #screen-login{align-items:center;justify-content:center;padding:2rem 1.25rem;background:linear-gradient(160deg,var(--navy) 0%,var(--navy2) 60%,#1B4F8E 100%);}
     .login-card{width:100%;max-width:380px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:2.5rem 2rem;backdrop-filter:blur(10px);}
     .login-logo{text-align:center;margin-bottom:2rem;}
-    .login-logo img{width:160px;height:auto;display:block;margin:0 auto 14px;background:white;border-radius:10px;padding:8px 12px;}
+    .login-logo img{width:160px;height:auto;display:block;margin:0 auto 14px;}
     .login-logo .app-name{font-size:20px;font-weight:900;color:#fff;letter-spacing:1px;}
     .login-logo .app-sub{font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;}
     .field{margin-bottom:14px;}
@@ -59,7 +59,7 @@
 
     /* ── TOPBAR ── */
     .topbar{background:var(--navy);padding:0 1.25rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-    .topbar img{height:28px;width:auto;background:white;border-radius:6px;padding:3px 6px;}
+    .topbar img{height:28px;width:auto;}
     .topbar-right{display:flex;align-items:center;gap:10px;}
     .topbar-name{font-size:13px;color:rgba(255,255,255,0.7);}
     .topbar-name strong{color:#fff;font-weight:700;}
@@ -333,23 +333,23 @@
     <div class="sec-title">카풀 인증</div>
     <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:1.25rem;margin-bottom:1rem;">
       <div class="m-field">
+        <label>방향</label>
+        <div style="display:flex;gap:8px;">
+          <button id="dir-commute" onclick="selectDir('commute')" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid #1D9E75;background:#1D9E75;color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">🏢 출근</button>
+          <button id="dir-leave" onclick="selectDir('leave')" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text-sub);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;">🏠 퇴근</button>
+        </div>
+        <input type="hidden" id="carpool-direction" value="commute"/>
+      </div>
+      <div class="m-field">
         <label>역할</label>
         <select id="carpool-role" style="width:100%;padding:11px 12px;font-size:14px;font-family:inherit;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--bg);color:var(--text);">
           <option value="driver">운전자 🚗</option>
           <option value="passenger">동행자 🧑</option>
         </select>
       </div>
-      <div class="m-field" id="passenger-field">
-        <label>동행자 이름 (운전자인 경우)</label>
+      <div class="m-field">
+        <label>동승자 이름</label>
         <input type="text" id="carpool-passenger" placeholder="예: 홍길동, 김철수"/>
-      </div>
-      <div class="m-field">
-        <label>출발지</label>
-        <input type="text" id="carpool-origin" placeholder="예: 서울 강남구"/>
-      </div>
-      <div class="m-field">
-        <label>도착지</label>
-        <input type="text" id="carpool-dest" placeholder="예: 대전 유성구 (CONTEC)"/>
       </div>
       <div class="m-field">
         <label>인증샷</label>
@@ -508,7 +508,7 @@ async function doLogin() {
   }
   err.style.display='none';
   app.name=name;
-  localStorage.setItem('contec_session',JSON.stringify({name}));
+  localStorage.setItem('contec_session',JSON.stringify({name, isAdmin:app.isAdmin}));
   document.getElementById('disp-name').textContent=name;
   document.getElementById('mb-title').textContent=getYMLabel();
   document.getElementById('ranking-ym').textContent=getYMLabel()+' 기준';
@@ -537,7 +537,12 @@ document.getElementById('btn-logout').addEventListener('click', ()=>{
     const s=JSON.parse(localStorage.getItem('contec_session')||'null');
     if(s&&s.name){
       document.getElementById('inp-name').value=s.name;
-      document.getElementById('inp-pw').value=CONFIG.password;
+      if(s.isAdmin){
+        switchLoginTab('admin');
+        document.getElementById('inp-pw').value=CONFIG.adminPassword;
+      } else {
+        document.getElementById('inp-pw').value=CONFIG.password;
+      }
       doLogin();
     }
   } catch(e){}
@@ -641,26 +646,36 @@ document.getElementById('carpool-role').addEventListener('change', function(){
 async function submitCarpool() {
   const role=document.getElementById('carpool-role').value;
   const passenger=document.getElementById('carpool-passenger').value.trim();
-  const origin=document.getElementById('carpool-origin').value.trim();
-  const dest=document.getElementById('carpool-dest').value.trim();
+  const direction=document.getElementById('carpool-direction').value;
   const file=document.getElementById('carpool-file').files[0];
-  if(!origin||!dest){showToast('❌ 출발지와 도착지를 입력해주세요');return;}
+  if(!passenger){showToast('❌ 동승자 이름을 입력해주세요');return;}
   if(!file){showToast('❌ 인증샷을 업로드해주세요');return;}
   showToast('📤 업로드 중...');
   const imgUrl=await SB.upload(file);
   if(!imgUrl){showToast('❌ 이미지 업로드 실패');return;}
-  const driver=role==='driver'?app.name:'';
+  const driverName=role==='driver'?app.name:passenger;
   const passengerName=role==='driver'?passenger:app.name;
-  const driverName=role==='passenger'?passenger:app.name;
-  const ok=await SB.post('carpools',{year_month:getYM(),driver:driverName,passenger:passengerName,origin,destination:dest,image_url:imgUrl,status:'pending'});
+  const dirLabel=direction==='commute'?'출근':'퇴근';
+  const ok=await SB.post('carpools',{year_month:getYM(),driver:driverName,passenger:passengerName,origin:dirLabel,destination:'CONTEC',image_url:imgUrl,status:'pending'});
   if(ok){
     showToast('✅ 카풀 인증 신청 완료! 관리자 승인을 기다려주세요');
-    document.getElementById('carpool-origin').value='';
-    document.getElementById('carpool-dest').value='';
     document.getElementById('carpool-passenger').value='';
     document.getElementById('carpool-preview').style.display='none';
     loadCarpoolRanking();
   } else { showToast('❌ 신청 실패'); }
+}
+
+function selectDir(dir) {
+  document.getElementById('carpool-direction').value=dir;
+  const commute=document.getElementById('dir-commute');
+  const leave=document.getElementById('dir-leave');
+  if(dir==='commute'){
+    commute.style.background='#1D9E75'; commute.style.color='#fff'; commute.style.borderColor='#1D9E75';
+    leave.style.background='var(--bg)'; leave.style.color='var(--text-sub)'; leave.style.borderColor='var(--border)';
+  } else {
+    leave.style.background='#1D9E75'; leave.style.color='#fff'; leave.style.borderColor='#1D9E75';
+    commute.style.background='var(--bg)'; commute.style.color='var(--text-sub)'; commute.style.borderColor='var(--border)';
+  }
 }
 
 async function loadCarpoolRanking() {
@@ -866,7 +881,7 @@ async function loadAdminPage() {
     cpEl.innerHTML=cp.map(r=>`<div class="pending-card">
       <div class="pending-info">
         <div class="pending-title">🚗 ${r.driver} → ${r.passenger}</div>
-        <div class="pending-sub">${r.origin} → ${r.destination}</div>
+        <div class="pending-sub">${r.origin} 카풀 · ${new Date(r.created_at).toLocaleDateString('ko-KR')}</div>
       </div>
       ${r.image_url?`<img class="pending-img" src="${r.image_url}" alt="인증샷"/>`:''}
       <div class="pending-btns">
