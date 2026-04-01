@@ -1,0 +1,26 @@
+{
+  "name": "CONTEC 랭킹 만보기",
+  "short_name": "만보기",
+  "description": "CONTEC 임직원 전용 걸음 수 챌린지",
+  "start_url": "/pdeometer/",
+  "scope": "/pdeometer/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f6f8",
+  "theme_color": "#1B4F8E",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
