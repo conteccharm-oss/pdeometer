@@ -1,4 +1,4 @@
-const CACHE = 'contec-challenge-v3';
+const CACHE = 'contec-challenge-v4';
 const ASSETS = [
   '/pdeometer/',
   '/pdeometer/index.html',
@@ -23,7 +23,6 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // 네트워크 우선 → 실패 시 캐시
   e.respondWith(
     fetch(e.request)
       .then(r => {
