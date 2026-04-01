@@ -3,372 +3,148 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>CONTEC 랭킹 만보기</title>
+  <title>CONTEC 건강 챌린지</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#1B4F8E" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="만보기" />
+  <meta name="apple-mobile-web-app-title" content="건강챌린지" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --blue: #1B4F8E;
-      --blue-dark: #143d6e;
-      --blue-light: #B5D4F4;
-      --blue-pale: #E6F1FB;
-      --gold: #FAC775;
-      --silver: #D3D1C7;
-      --bronze: #F5C4B3;
-      --text: #1a1a1a;
-      --text-sub: #666;
-      --text-hint: #999;
-      --border: rgba(0,0,0,0.1);
-      --bg: #f5f6f8;
-      --card: #ffffff;
-      --success: #1D9E75;
-      --danger: #e24b4a;
+      --blue: #1B4F8E; --blue-dark: #143d6e; --blue-light: #B5D4F4; --blue-pale: #E6F1FB;
+      --gold: #FAC775; --silver: #D3D1C7; --bronze: #F5C4B3;
+      --text: #1a1a1a; --text-sub: #666; --text-hint: #999;
+      --border: rgba(0,0,0,0.08); --bg: #f4f6fb; --card: #fff; --danger: #e24b4a;
+      --c-steps: #1B4F8E; --c-exercise: #1D9E75; --c-sleep: #7B5EA7; --c-water: #2196F3;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* ── SCREENS ── */
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; }
     .screen { display: none; min-height: 100vh; }
     .screen.active { display: flex; flex-direction: column; }
 
-    /* ── LOGIN ── */
-    #screen-login {
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1.25rem;
-      background: linear-gradient(160deg, #f0f4fa 0%, #e8eef8 100%);
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 380px;
-      background: var(--card);
-      border-radius: 20px;
-      padding: 2.5rem 2rem;
-      box-shadow: 0 4px 24px rgba(27,79,142,0.10);
-    }
-
-    .login-logo {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .login-logo img {
-      width: 160px;
-      height: auto;
-      display: block;
-      margin: 0 auto 14px;
-    }
-    .login-logo .app-name {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--blue);
-      letter-spacing: -0.3px;
-    }
-    .login-logo .app-sub {
-      font-size: 12px;
-      color: var(--text-sub);
-      margin-top: 4px;
-    }
-
+    /* LOGIN */
+    #screen-login { align-items: center; justify-content: center; padding: 2rem 1.25rem; background: linear-gradient(160deg, #eef2fb 0%, #e4ecf7 100%); }
+    .login-card { width: 100%; max-width: 380px; background: var(--card); border-radius: 24px; padding: 2.5rem 2rem; box-shadow: 0 8px 32px rgba(27,79,142,0.12); }
+    .login-logo { text-align: center; margin-bottom: 2rem; }
+    .login-logo img { width: 150px; height: auto; display: block; margin: 0 auto 12px; }
+    .login-logo .app-name { font-size: 17px; font-weight: 700; color: var(--blue); }
+    .login-logo .app-sub { font-size: 12px; color: var(--text-sub); margin-top: 3px; }
     .field { margin-bottom: 14px; }
-    .field label {
-      display: block;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-sub);
-      margin-bottom: 6px;
-    }
-    .field input {
-      width: 100%;
-      padding: 11px 14px;
-      font-size: 15px;
-      font-family: inherit;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      background: var(--bg);
-      color: var(--text);
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .field input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(27,79,142,0.12);
-      background: #fff;
-    }
+    .field label { display: block; font-size: 12px; font-weight: 500; color: var(--text-sub); margin-bottom: 6px; }
+    .field input { width: 100%; padding: 11px 14px; font-size: 15px; font-family: inherit; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .field input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(27,79,142,0.12); background: #fff; }
     .pw-wrap { position: relative; }
     .pw-wrap input { padding-right: 56px; }
-    .pw-eye {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      font-size: 12px; color: var(--text-hint);
-      background: none; border: none; cursor: pointer; padding: 4px;
-    }
-
-    .error-msg {
-      font-size: 12px;
-      color: var(--danger);
-      margin-top: 6px;
-      display: none;
-    }
-
-    .btn-login {
-      width: 100%;
-      padding: 13px;
-      margin-top: 8px;
-      background: var(--blue);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-    }
+    .pw-eye { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-hint); background: none; border: none; cursor: pointer; padding: 4px; }
+    .error-msg { font-size: 12px; color: var(--danger); margin-top: 6px; display: none; }
+    .btn-login { width: 100%; padding: 13px; margin-top: 8px; background: var(--blue); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; }
     .btn-login:hover { background: var(--blue-dark); }
-    .btn-login:active { transform: scale(0.98); }
+    .login-hint { text-align: center; font-size: 12px; color: var(--text-hint); margin-top: 14px; }
 
-    .login-hint {
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-hint);
-      margin-top: 14px;
-    }
-
-    /* ── MAIN APP ── */
-    #screen-main {
-      flex-direction: column;
-      background: var(--bg);
-    }
-
-    /* Topbar */
-    .topbar {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
-      padding: 0 1.25rem;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .topbar img { height: 24px; width: auto; }
+    /* TOPBAR */
+    .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 1.25rem; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .topbar img { height: 22px; width: auto; }
     .topbar-right { display: flex; align-items: center; gap: 10px; }
     .topbar-name { font-size: 13px; color: var(--text-sub); }
     .topbar-name strong { color: var(--text); font-weight: 700; }
-    .btn-logout {
-      font-size: 12px; color: var(--text-hint);
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 8px; padding: 5px 10px; cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-logout:hover { color: var(--text); }
+    .btn-logout { font-size: 12px; color: var(--text-hint); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; cursor: pointer; font-family: inherit; }
 
-    /* Scroll content */
-    .main-content { flex: 1; overflow-y: auto; padding: 1.25rem; padding-bottom: 2rem; }
+    .main-content { flex: 1; overflow-y: auto; padding: 1.25rem; padding-bottom: 5rem; }
 
-    /* Sensor bar */
-    .sensor-bar {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border);
-    }
-    .sensor-left { display: flex; align-items: center; gap: 10px; }
-    .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--text-hint);
-      flex-shrink: 0;
-    }
-    .dot.on { background: var(--success); animation: blink 1.5s infinite; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-    .sensor-text { font-size: 13px; color: var(--text-sub); }
-    .btn-sensor {
-      font-size: 13px; font-weight: 500; font-family: inherit;
-      padding: 7px 16px;
-      border: 1.5px solid var(--blue);
-      border-radius: 8px;
-      background: none;
-      color: var(--blue);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .btn-sensor:hover { background: var(--blue-pale); }
-    .btn-sensor.stop { border-color: var(--danger); color: var(--danger); }
-    .btn-sensor.stop:hover { background: #fdf0f0; }
+    /* TODAY HEADER */
+    .today-header { background: var(--blue); border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; color: white; display: flex; align-items: center; justify-content: space-between; }
+    .today-date { font-size: 12px; opacity: 0.8; margin-bottom: 2px; }
+    .today-title { font-size: 17px; font-weight: 700; }
+    .today-badge { background: rgba(255,255,255,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 500; }
 
-    /* Step ring card */
-    .step-card {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 2rem 1.5rem 1.5rem;
-      text-align: center;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border);
-    }
-    .ring-wrap { position: relative; display: inline-block; margin-bottom: 1rem; }
-    .step-ring { transform: rotate(-90deg); display: block; }
-    .ring-track { fill: none; stroke: var(--bg); stroke-width: 10; }
-    .ring-prog {
-      fill: none; stroke: var(--blue); stroke-width: 10;
-      stroke-linecap: round;
-      transition: stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1);
-    }
-    .ring-center {
-      position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      text-align: center;
-      pointer-events: none;
-    }
-    .ring-steps { font-size: 36px; font-weight: 700; color: var(--blue); line-height: 1; }
-    .ring-label { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+    .section-title { font-size: 12px; font-weight: 700; color: var(--text-sub); margin-bottom: 10px; letter-spacing: 0.3px; }
 
-    .step-goal-row { font-size: 13px; color: var(--text-sub); }
-    .step-goal-row span { color: var(--blue); font-weight: 700; }
-    .step-pct { font-size: 13px; color: var(--text-hint); margin-top: 4px; }
+    /* INPUT CARDS */
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .input-card { background: var(--card); border-radius: 16px; border: 1.5px solid var(--border); padding: 1rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+    .input-card:active { transform: scale(0.97); }
+    .ic-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 16px 16px 0 0; opacity: 0; transition: opacity 0.2s; }
+    .input-card.done .ic-bar { opacity: 1; }
+    .ic-icon { font-size: 22px; margin-bottom: 6px; }
+    .ic-label { font-size: 11px; color: var(--text-sub); font-weight: 500; margin-bottom: 4px; }
+    .ic-value { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+    .ic-unit { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+    .ic-edit { font-size: 11px; font-weight: 500; margin-top: 6px; }
 
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 1rem;
-    }
-    .stat-box {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 14px 10px;
-      text-align: center;
-      border: 1px solid var(--border);
-    }
-    .stat-icon { font-size: 18px; margin-bottom: 4px; }
-    .stat-val { font-size: 20px; font-weight: 700; color: var(--text); }
-    .stat-lbl { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+    /* SAVE BUTTON */
+    .btn-save { width: 100%; padding: 14px; background: var(--blue); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; margin-bottom: 1.5rem; }
+    .btn-save:disabled { background: var(--text-hint); cursor: not-allowed; }
 
-    /* Tabs */
-    .tabs {
-      display: flex;
-      background: var(--card);
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 1rem;
-      border: 1px solid var(--border);
-      gap: 4px;
-    }
-    .tab {
-      flex: 1; padding: 8px; font-size: 13px; font-weight: 500;
-      border: none; border-radius: 8px; cursor: pointer;
-      background: none; color: var(--text-sub); font-family: inherit;
-      transition: all 0.15s;
-    }
+    /* TABS */
+    .tabs { display: flex; background: var(--card); border-radius: 12px; padding: 4px; margin-bottom: 1rem; border: 1px solid var(--border); gap: 3px; }
+    .tab { flex: 1; padding: 7px 4px; font-size: 12px; font-weight: 500; border: none; border-radius: 8px; cursor: pointer; background: none; color: var(--text-sub); font-family: inherit; }
     .tab.active { background: var(--blue); color: white; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
 
-    /* Ranking */
-    .rank-list {
-      background: var(--card);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-    .rank-row {
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.1s;
-    }
+    /* RANKING */
+    .rank-list { background: var(--card); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
+    .rank-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
     .rank-row:last-child { border-bottom: none; }
     .rank-row.is-me { background: var(--blue-pale); }
-
-    .rank-num {
-      width: 30px; height: 30px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; flex-shrink: 0;
-      background: var(--bg); color: var(--text-sub);
-    }
+    .rank-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; background: var(--bg); color: var(--text-sub); }
     .rank-num.r1 { background: var(--gold); color: #7a4a00; }
     .rank-num.r2 { background: var(--silver); color: #444; }
     .rank-num.r3 { background: var(--bronze); color: #6b2f1a; }
-
-    .rank-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: var(--blue-light); color: var(--blue-dark);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; flex-shrink: 0;
-    }
+    .rank-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--blue-light); color: var(--blue-dark); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
     .rank-row.is-me .rank-avatar { background: var(--blue); color: white; }
-
     .rank-info { flex: 1; min-width: 0; }
-    .rank-name { font-size: 14px; font-weight: 500; color: var(--text); }
-    .rank-sub { font-size: 11px; color: var(--text-hint); margin-top: 1px; }
+    .rank-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .rank-bar-bg { height: 3px; background: var(--bg); border-radius: 2px; margin-top: 4px; }
+    .rank-bar-fill { height: 3px; border-radius: 2px; }
+    .rank-val { text-align: right; flex-shrink: 0; }
+    .rank-val-num { font-size: 14px; font-weight: 700; }
+    .rank-val-unit { font-size: 10px; color: var(--text-hint); }
+    .rank-empty { padding: 1.5rem; text-align: center; color: var(--text-hint); font-size: 13px; }
+    .rank-month { text-align: center; padding: 8px; font-size: 11px; color: var(--text-hint); }
 
-    .rank-steps { text-align: right; }
-    .rank-steps-num { font-size: 15px; font-weight: 700; color: var(--blue); }
-    .rank-steps-lbl { font-size: 11px; color: var(--text-hint); }
+    /* MODAL */
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: flex-end; justify-content: center; z-index: 200; }
+    .modal-bg.open { display: flex; }
+    .modal { background: var(--card); border-radius: 24px 24px 0 0; padding: 1.5rem; width: 100%; max-width: 480px; }
+    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 1.25rem; }
+    .water-btns { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+    .water-btn { padding: 8px 14px; border: 1.5px solid var(--c-water); border-radius: 20px; background: none; color: var(--c-water); font-size: 13px; font-weight: 500; font-family: inherit; cursor: pointer; }
+    .modal-input-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .modal-input { flex: 1; padding: 14px; font-size: 28px; font-weight: 700; font-family: inherit; border: 2px solid var(--border); border-radius: 12px; text-align: center; outline: none; color: var(--text); background: var(--bg); }
+    .modal-input:focus { border-color: var(--blue); }
+    .modal-unit { font-size: 16px; color: var(--text-sub); font-weight: 500; min-width: 36px; }
+    .modal-hint { font-size: 12px; color: var(--text-hint); margin-bottom: 1.25rem; }
+    .modal-btns { display: flex; gap: 8px; }
+    .btn-cancel { flex: 1; padding: 13px; border: 1.5px solid var(--border); border-radius: 10px; background: none; font-size: 14px; font-family: inherit; cursor: pointer; color: var(--text-sub); }
+    .btn-confirm { flex: 2; padding: 13px; background: var(--blue); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; }
 
-    /* Progress bar in rank */
-    .rank-bar-wrap { padding: 0 16px 10px; }
-    .rank-bar-bg { height: 3px; background: var(--bg); border-radius: 2px; margin-top: 6px; }
-    .rank-bar-fill { height: 3px; background: var(--blue); border-radius: 2px; transition: width 0.4s ease; }
+    /* BOTTOM NAV */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 100; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; padding: 4px; font-family: inherit; color: var(--text-hint); }
+    .nav-btn.active { color: var(--blue); }
+    .nav-icon { font-size: 20px; }
+    .nav-label { font-size: 10px; font-weight: 500; }
 
-    /* Weekly chart */
-    .weekly-card {
-      background: var(--card);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      padding: 1.25rem;
-    }
-    .weekly-title { font-size: 13px; font-weight: 500; color: var(--text-sub); margin-bottom: 1rem; }
-    .chart-bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-bottom: 8px; }
-    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
-    .bar-val { font-size: 9px; color: var(--text-hint); }
-    .bar-body { width: 100%; border-radius: 5px 5px 0 0; background: var(--blue-light); min-height: 3px; transition: height 0.5s ease; }
-    .bar-body.today { background: var(--blue); }
-    .chart-days { display: flex; gap: 8px; }
-    .day-lbl { flex: 1; text-align: center; font-size: 11px; color: var(--text-hint); }
-    .day-lbl.today { color: var(--blue); font-weight: 700; }
-
-    /* Empty ranking */
-    .rank-empty { padding: 2rem; text-align: center; color: var(--text-hint); font-size: 13px; }
+    .save-toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #1a1a1a; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity 0.3s; z-index: 300; pointer-events: none; white-space: nowrap; }
+    .save-toast.show { opacity: 1; }
   </style>
 </head>
 <body>
 
-<!-- ═══════════════════ LOGIN ═══════════════════ -->
+<!-- LOGIN -->
 <div class="screen active" id="screen-login">
   <div class="login-card">
     <div class="login-logo">
       <img src="logo.png" alt="CONTEC" />
-      <div class="app-name">랭킹 만보기</div>
-      <div class="app-sub">임직원 전용 걸음 수 챌린지</div>
+      <div class="app-name">건강 챌린지</div>
+      <div class="app-sub">CONTEC 임직원 전용 웰니스 프로그램</div>
     </div>
-
     <div class="field">
       <label>이름</label>
       <input type="text" id="inp-name" placeholder="홍길동" autocomplete="name" />
     </div>
-
     <div class="field">
       <label>접속 암호</label>
       <div class="pw-wrap">
@@ -377,15 +153,13 @@
       </div>
       <div class="error-msg" id="login-err"></div>
     </div>
-
     <button class="btn-login" id="btn-login">입장하기</button>
     <div class="login-hint">암호를 모르시면 담당자에게 문의하세요</div>
   </div>
 </div>
 
-<!-- ═══════════════════ MAIN ═══════════════════ -->
+<!-- MAIN -->
 <div class="screen" id="screen-main">
-
   <div class="topbar">
     <img src="logo.png" alt="CONTEC" />
     <div class="topbar-right">
@@ -394,421 +168,364 @@
     </div>
   </div>
 
-  <div class="main-content">
-
-    <!-- Sensor -->
-    <div class="sensor-bar">
-      <div class="sensor-left">
-        <div class="dot" id="sensor-dot"></div>
-        <span class="sensor-text" id="sensor-text">센서 비활성화</span>
+  <!-- 오늘 기록 페이지 -->
+  <div class="main-content" id="page-today">
+    <div class="today-header">
+      <div>
+        <div class="today-date" id="today-date"></div>
+        <div class="today-title">오늘의 건강 기록</div>
       </div>
-      <button class="btn-sensor" id="btn-sensor">감지 시작</button>
+      <div class="today-badge" id="today-badge">0 / 4 완료</div>
     </div>
 
-    <!-- Step ring -->
-    <div class="step-card">
-      <div class="ring-wrap">
-        <svg class="step-ring" width="180" height="180" viewBox="0 0 180 180">
-          <circle class="ring-track" cx="90" cy="90" r="78"/>
-          <circle class="ring-prog" id="ring-prog" cx="90" cy="90" r="78"
-            stroke-dasharray="490" stroke-dashoffset="490"/>
-        </svg>
-        <div class="ring-center">
-          <div class="ring-steps" id="disp-steps">0</div>
-          <div class="ring-label">걸음</div>
-        </div>
+    <div class="section-title">항목 입력 (탭하여 수정)</div>
+    <div class="input-grid">
+      <div class="input-card" id="card-steps" onclick="openModal('steps')" style="--ic:#1B4F8E;">
+        <div class="ic-bar" style="background:var(--c-steps)"></div>
+        <div class="ic-icon">🚶</div>
+        <div class="ic-label">걸음 수</div>
+        <div class="ic-value" id="val-steps">0</div>
+        <div class="ic-unit">걸음</div>
+        <div class="ic-edit" style="color:var(--c-steps)">탭하여 입력</div>
       </div>
-      <div class="step-goal-row">목표 <span id="disp-goal">10,000</span> 걸음</div>
-      <div class="step-pct" id="disp-pct">0% 달성</div>
+      <div class="input-card" id="card-exercise" onclick="openModal('exercise')" style="--ic:#1D9E75;">
+        <div class="ic-bar" style="background:var(--c-exercise)"></div>
+        <div class="ic-icon">💪</div>
+        <div class="ic-label">운동 시간</div>
+        <div class="ic-value" id="val-exercise">0</div>
+        <div class="ic-unit">분</div>
+        <div class="ic-edit" style="color:var(--c-exercise)">탭하여 입력</div>
+      </div>
+      <div class="input-card" id="card-sleep" onclick="openModal('sleep')" style="--ic:#7B5EA7;">
+        <div class="ic-bar" style="background:var(--c-sleep)"></div>
+        <div class="ic-icon">😴</div>
+        <div class="ic-label">수면 시간</div>
+        <div class="ic-value" id="val-sleep">0</div>
+        <div class="ic-unit">시간</div>
+        <div class="ic-edit" style="color:var(--c-sleep)">탭하여 입력</div>
+      </div>
+      <div class="input-card" id="card-water" onclick="openModal('water')" style="--ic:#2196F3;">
+        <div class="ic-bar" style="background:var(--c-water)"></div>
+        <div class="ic-icon">💧</div>
+        <div class="ic-label">물 마시기</div>
+        <div class="ic-value" id="val-water">0</div>
+        <div class="ic-unit">잔 (200ml)</div>
+        <div class="ic-edit" style="color:var(--c-water)">탭하여 입력</div>
+      </div>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-box">
-        <div class="stat-icon">🚶</div>
-        <div class="stat-val" id="disp-dist">0.0</div>
-        <div class="stat-lbl">km</div>
+    <button class="btn-save" id="btn-save">오늘 기록 저장하기</button>
+
+    <div class="section-title">이번 달 내 누적</div>
+    <div class="input-grid">
+      <div class="input-card" style="cursor:default;">
+        <div class="ic-icon">🚶</div>
+        <div class="ic-label">총 걸음 수</div>
+        <div class="ic-value" id="my-steps">-</div>
+        <div class="ic-unit">걸음</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-icon">🔥</div>
-        <div class="stat-val" id="disp-cal">0</div>
-        <div class="stat-lbl">kcal</div>
+      <div class="input-card" style="cursor:default;">
+        <div class="ic-icon">💪</div>
+        <div class="ic-label">총 운동</div>
+        <div class="ic-value" id="my-exercise">-</div>
+        <div class="ic-unit">분</div>
       </div>
-      <div class="stat-box">
-        <div class="stat-icon">⏱</div>
-        <div class="stat-val" id="disp-time">0</div>
-        <div class="stat-lbl">분</div>
+      <div class="input-card" style="cursor:default;">
+        <div class="ic-icon">😴</div>
+        <div class="ic-label">평균 수면</div>
+        <div class="ic-value" id="my-sleep">-</div>
+        <div class="ic-unit">시간</div>
+      </div>
+      <div class="input-card" style="cursor:default;">
+        <div class="ic-icon">💧</div>
+        <div class="ic-label">총 수분</div>
+        <div class="ic-value" id="my-water">-</div>
+        <div class="ic-unit">잔</div>
       </div>
     </div>
+  </div>
 
-    <!-- Tabs -->
+  <!-- 랭킹 페이지 -->
+  <div class="main-content" id="page-ranking" style="display:none;">
     <div class="tabs">
-      <button class="tab active" data-tab="ranking">🏆 랭킹</button>
-      <button class="tab" data-tab="weekly">📊 주간 기록</button>
+      <button class="tab active" data-rank="steps">🚶 걸음</button>
+      <button class="tab" data-rank="exercise">💪 운동</button>
+      <button class="tab" data-rank="sleep">😴 수면</button>
+      <button class="tab" data-rank="water">💧 수분</button>
     </div>
+    <div id="rank-content"><div class="rank-list"><div class="rank-empty">불러오는 중...</div></div></div>
+  </div>
 
-    <!-- Ranking panel -->
-    <div class="tab-panel active" id="panel-ranking">
-      <div class="rank-list" id="rank-list"></div>
-    </div>
-
-    <!-- Weekly panel -->
-    <div class="tab-panel" id="panel-weekly">
-      <div class="weekly-card">
-        <div class="weekly-title">이번 주 걸음 수</div>
-        <div class="chart-bars" id="chart-bars"></div>
-        <div class="chart-days" id="chart-days"></div>
-      </div>
-    </div>
-
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-today" onclick="switchPage('today')">
+      <div class="nav-icon">📋</div>
+      <div class="nav-label">오늘 기록</div>
+    </button>
+    <button class="nav-btn" id="nav-ranking" onclick="switchPage('ranking')">
+      <div class="nav-icon">🏆</div>
+      <div class="nav-label">랭킹</div>
+    </button>
   </div>
 </div>
 
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="water-btns" id="water-btns" style="display:none;">
+      <button class="water-btn" onclick="addWater(1)">+1잔</button>
+      <button class="water-btn" onclick="addWater(2)">+2잔</button>
+      <button class="water-btn" onclick="addWater(4)">+4잔</button>
+      <button class="water-btn" onclick="addWater(8)">+8잔</button>
+    </div>
+    <div class="modal-input-wrap">
+      <input type="number" class="modal-input" id="modal-input" min="0" />
+      <div class="modal-unit" id="modal-unit"></div>
+    </div>
+    <div class="modal-hint" id="modal-hint"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">취소</button>
+      <button class="btn-confirm" onclick="confirmModal()">확인</button>
+    </div>
+  </div>
+</div>
+
+<div class="save-toast" id="save-toast"></div>
+
 <script>
-// ═══════════════════════════════════════════
-//  설정 — 이 부분만 수정하면 됩니다
-// ═══════════════════════════════════════════
-//  설정
-// ═══════════════════════════════════════════
 const CONFIG = {
   password: 'contec2024',
-  goal: 10000,
   supabaseUrl: 'https://ifytanvhskqmbvmjoohi.supabase.co',
   supabaseKey: 'sb_publishable_jRme4n_S6tw5U3HBmv4Rgw_hKOfDXIy',
 };
 
-const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
-const weeklyHistory = [0, 0, 0, 0, 0, 0, 0];
+const CATS = {
+  steps:    { label:'걸음 수',   unit:'걸음', color:'#1B4F8E', hint:'삼성헬스/애플건강에서 확인 후 입력하세요' },
+  exercise: { label:'운동 시간', unit:'분',   color:'#1D9E75', hint:'오늘 운동한 총 시간 (유산소+근력 합산)' },
+  sleep:    { label:'수면 시간', unit:'시간', color:'#7B5EA7', hint:'어젯밤 수면 시간을 입력하세요' },
+  water:    { label:'물 마시기', unit:'잔',   color:'#2196F3', hint:'오늘 마신 물 잔 수 (1잔=200ml)' },
+};
 
-// ═══════════════════════════════════════════
-//  Supabase API 헬퍼
-// ═══════════════════════════════════════════
 const SB = {
-  headers: {
-    'Content-Type': 'application/json',
-    'apikey': CONFIG.supabaseKey,
-    'Authorization': 'Bearer ' + CONFIG.supabaseKey,
+  h: { 'Content-Type':'application/json', 'apikey':CONFIG.supabaseKey, 'Authorization':'Bearer '+CONFIG.supabaseKey },
+  async get(name, date) {
+    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?name=eq.'+encodeURIComponent(name)+'&date=eq.'+date, {headers:this.h});
+    if(!r.ok) return null;
+    const d = await r.json(); return d[0]||null;
   },
-
-  // 이번 달 전체 랭킹 가져오기
-  async getRanking() {
-    const ym = getYearMonth();
-    const res = await fetch(
-      CONFIG.supabaseUrl + '/rest/v1/steps?year_month=eq.' + ym + '&order=steps.desc',
-      { headers: this.headers }
-    );
-    return res.ok ? res.json() : [];
-  },
-
-  // 내 기록 가져오기 (이번 달)
-  async getMyRecord(name) {
-    const ym = getYearMonth();
-    const res = await fetch(
-      CONFIG.supabaseUrl + '/rest/v1/steps?name=eq.' + encodeURIComponent(name) + '&year_month=eq.' + ym,
-      { headers: this.headers }
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data[0] || null;
-  },
-
-  // 걸음 수 저장 (없으면 insert, 있으면 update)
-  async saveSteps(name, steps) {
-    const ym = getYearMonth();
-    const existing = await this.getMyRecord(name);
-    if (existing) {
-      await fetch(
-        CONFIG.supabaseUrl + '/rest/v1/steps?id=eq.' + existing.id,
-        {
-          method: 'PATCH',
-          headers: { ...this.headers, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ steps, updated_at: new Date().toISOString() })
-        }
-      );
+  async upsert(name, date, data) {
+    const ex = await this.get(name, date);
+    const ym = date.slice(0,7);
+    if(ex) {
+      await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?id=eq.'+ex.id, {method:'PATCH', headers:{...this.h,'Prefer':'return=minimal'}, body:JSON.stringify({...data, updated_at:new Date().toISOString()})});
     } else {
-      await fetch(
-        CONFIG.supabaseUrl + '/rest/v1/steps',
-        {
-          method: 'POST',
-          headers: { ...this.headers, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ name, steps, year_month: ym })
-        }
-      );
+      await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records', {method:'POST', headers:{...this.h,'Prefer':'return=minimal'}, body:JSON.stringify({name, date, year_month:ym, ...data})});
     }
+  },
+  async ranking(ym, cat) {
+    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?year_month=eq.'+ym+'&select=name,'+cat, {headers:this.h});
+    if(!r.ok) return [];
+    const rows = await r.json();
+    const map = {};
+    rows.forEach(row => { if(!map[row.name]) map[row.name]={sum:0,cnt:0}; map[row.name].sum+=(row[cat]||0); map[row.name].cnt++; });
+    return Object.entries(map).map(([name,v])=>({name,val:v.sum,cnt:v.cnt})).sort((a,b)=>b.val-a.val);
+  },
+  async monthly(name, ym) {
+    const r = await fetch(CONFIG.supabaseUrl+'/rest/v1/health_records?name=eq.'+encodeURIComponent(name)+'&year_month=eq.'+ym, {headers:this.h});
+    return r.ok ? r.json() : [];
   }
 };
 
-function getYearMonth() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-}
+const app = { name:'', today:{steps:0,exercise:0,sleep:0,water:0} };
+let modalCat = '';
 
-// ═══════════════════════════════════════════
-//  앱 상태
-// ═══════════════════════════════════════════
-const app = {
-  name: '',
-  steps: 0,
-  activeMin: 0,
-  sensing: false,
-  _accBuf: [],
-  _lastStep: 0,
-  _activeTimer: null,
-};
+function getToday() { return new Date().toISOString().slice(0,10); }
+function getYM() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 
-// ═══════════════════════════════════════════
-//  화면 전환
-// ═══════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ═══════════════════════════════════════════
-//  로그인
-// ═══════════════════════════════════════════
+// LOGIN
 document.getElementById('btn-eye').addEventListener('click', function() {
-  const inp = document.getElementById('inp-pw');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-  this.textContent = inp.type === 'password' ? '보기' : '숨기기';
+  const i=document.getElementById('inp-pw');
+  i.type=i.type==='password'?'text':'password';
+  this.textContent=i.type==='password'?'보기':'숨기기';
 });
 
-function doLogin() {
-  const name = document.getElementById('inp-name').value.trim();
-  const pw   = document.getElementById('inp-pw').value;
-  const err  = document.getElementById('login-err');
+async function doLogin() {
+  const name=document.getElementById('inp-name').value.trim();
+  const pw=document.getElementById('inp-pw').value;
+  const err=document.getElementById('login-err');
+  if(!name){showErr(err,'이름을 입력해주세요');return;}
+  if(pw!==CONFIG.password){showErr(err,'암호가 올바르지 않습니다');return;}
+  err.style.display='none';
+  app.name=name;
+  document.getElementById('disp-name').textContent=name;
+  const d=new Date();
+  document.getElementById('today-date').textContent=d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일 '+['일','월','화','수','목','금','토'][d.getDay()]+'요일';
+  // 세션 저장 (자동 로그인용)
+  localStorage.setItem('contec_session', JSON.stringify({ name, savedAt: Date.now() }));
 
-  if (!name) { showErr(err, '이름을 입력해주세요'); return; }
-  if (pw !== CONFIG.password) { showErr(err, '암호가 올바르지 않습니다'); return; }
-
-  err.style.display = 'none';
-  app.name = name;
-  app.steps = 0;
-  app.activeMin = 0;
-  document.getElementById('disp-name').textContent = name;
-
-  // 로컬 캐시 먼저 불러오기
-  try {
-    const saved = JSON.parse(localStorage.getItem('contec_steps'));
-    if (saved && saved.ym === getYearMonth() && saved.name === name) {
-      app.steps = saved.steps;
-    }
-  } catch(e) {}
-
-  updateUI();
-  renderWeekly();
-  showScreen('screen-main');
-
-  // Supabase에서 이번 달 내 기록 불러오기
-  SB.getMyRecord(name).then(rec => {
-    if (rec && rec.steps > app.steps) {
-      app.steps = rec.steps;
-      updateUI();
-    }
-    loadRanking();
-  });
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-main').classList.add('active');
+  loadToday();
+  loadMonthly();
 }
 
 document.getElementById('btn-login').addEventListener('click', doLogin);
-document.getElementById('inp-pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-document.getElementById('inp-name').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-pw').focus(); });
+document.getElementById('inp-pw').addEventListener('keydown', e=>{if(e.key==='Enter')doLogin();});
+document.getElementById('inp-name').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('inp-pw').focus();});
+function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 
-function showErr(el, msg) { el.textContent = msg; el.style.display = 'block'; }
-
-// ═══════════════════════════════════════════
-//  로그아웃
-// ═══════════════════════════════════════════
-document.getElementById('btn-logout').addEventListener('click', () => {
-  stopSensor();
-  app.steps = 0; app.activeMin = 0;
-  document.getElementById('inp-pw').value = '';
-  document.getElementById('inp-name').value = '';
-  showScreen('screen-login');
+document.getElementById('btn-logout').addEventListener('click', ()=>{
+  localStorage.removeItem('contec_session');
+  localStorage.removeItem('contec_h');
+  app.name=''; app.today={steps:0,exercise:0,sleep:0,water:0};
+  document.getElementById('inp-pw').value='';
+  document.getElementById('inp-name').value='';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-login').classList.add('active');
 });
 
-// ═══════════════════════════════════════════
-//  탭
-// ═══════════════════════════════════════════
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+// DATA
+async function loadToday() {
+  try {
+    const cached=JSON.parse(localStorage.getItem('contec_h')||'{}');
+    if(cached.date===getToday()&&cached.name===app.name){app.today=cached.data;updateTodayUI();}
+    const rec=await SB.get(app.name,getToday());
+    if(rec){app.today={steps:rec.steps||0,exercise:rec.exercise||0,sleep:rec.sleep||0,water:rec.water||0};updateTodayUI();saveCache();}
+  } catch(e){}
+}
+
+async function loadMonthly() {
+  try {
+    const rows=await SB.monthly(app.name,getYM());
+    let steps=0,exercise=0,sleep=0,water=0,sleepDays=0;
+    rows.forEach(r=>{steps+=r.steps||0;exercise+=r.exercise||0;water+=r.water||0;if(r.sleep>0){sleep+=r.sleep;sleepDays++;}});
+    document.getElementById('my-steps').textContent=steps.toLocaleString('ko-KR');
+    document.getElementById('my-exercise').textContent=exercise;
+    document.getElementById('my-sleep').textContent=sleepDays>0?(sleep/sleepDays).toFixed(1):0;
+    document.getElementById('my-water').textContent=water;
+  } catch(e){}
+}
+
+function saveCache() {
+  localStorage.setItem('contec_h',JSON.stringify({date:getToday(),name:app.name,data:app.today}));
+}
+
+function updateTodayUI() {
+  ['steps','exercise','sleep','water'].forEach(cat=>{
+    const v=app.today[cat];
+    document.getElementById('val-'+cat).textContent=cat==='steps'?v.toLocaleString('ko-KR'):v;
+    document.getElementById('card-'+cat).classList.toggle('done',v>0);
+  });
+  const done=Object.values(app.today).filter(v=>v>0).length;
+  document.getElementById('today-badge').textContent=done+' / 4 완료';
+}
+
+// SAVE
+document.getElementById('btn-save').addEventListener('click', async ()=>{
+  const btn=document.getElementById('btn-save');
+  btn.disabled=true; btn.textContent='저장 중...';
+  try {
+    await SB.upsert(app.name,getToday(),app.today);
+    saveCache(); loadMonthly();
+    showToast('✅ 오늘 기록이 저장되었습니다!');
+  } catch(e){ showToast('❌ 저장 실패. 다시 시도해주세요.'); }
+  btn.disabled=false; btn.textContent='오늘 기록 저장하기';
+});
+
+function showToast(msg) {
+  const t=document.getElementById('save-toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// MODAL
+function openModal(cat) {
+  modalCat=cat;
+  const info=CATS[cat];
+  document.getElementById('modal-title').textContent=info.label+' 입력';
+  document.getElementById('modal-unit').textContent=info.unit;
+  document.getElementById('modal-hint').textContent=info.hint;
+  document.getElementById('modal-input').value=app.today[cat]||'';
+  document.getElementById('water-btns').style.display=cat==='water'?'flex':'none';
+  document.getElementById('modal-bg').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-input').focus(),100);
+}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+function confirmModal(){
+  const v=parseFloat(document.getElementById('modal-input').value)||0;
+  app.today[modalCat]=v; updateTodayUI(); closeModal();
+}
+function addWater(n){
+  const v=parseFloat(document.getElementById('modal-input').value)||0;
+  document.getElementById('modal-input').value=v+n;
+}
+document.getElementById('modal-bg').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+// PAGE SWITCH
+function switchPage(page) {
+  document.getElementById('page-today').style.display=page==='today'?'block':'none';
+  document.getElementById('page-ranking').style.display=page==='ranking'?'block':'none';
+  document.getElementById('nav-today').classList.toggle('active',page==='today');
+  document.getElementById('nav-ranking').classList.toggle('active',page==='ranking');
+  if(page==='ranking') loadRanking('steps');
+}
+
+// RANKING
+document.querySelectorAll('.tab[data-rank]').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab[data-rank]').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
-    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    loadRanking(tab.dataset.rank);
   });
 });
 
-// ═══════════════════════════════════════════
-//  센서 (걸음 감지)
-// ═══════════════════════════════════════════
-document.getElementById('btn-sensor').addEventListener('click', () => {
-  app.sensing ? stopSensor() : startSensor();
-});
-
-function startSensor() {
-  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-    DeviceMotionEvent.requestPermission()
-      .then(r => { if (r === 'granted') activateSensor(); else useFallback(); })
-      .catch(useFallback);
-  } else if (window.DeviceMotionEvent) {
-    activateSensor();
-  } else {
-    useFallback();
-  }
-}
-
-function activateSensor() {
-  app.sensing = true;
-  window.addEventListener('devicemotion', onMotion);
-  document.getElementById('sensor-dot').classList.add('on');
-  document.getElementById('sensor-text').textContent = '걸음 감지 중...';
-  const btn = document.getElementById('btn-sensor');
-  btn.textContent = '중지'; btn.classList.add('stop');
-  app._activeTimer = setInterval(() => {
-    app.activeMin++;
-    document.getElementById('disp-time').textContent = app.activeMin;
-  }, 60000);
-}
-
-function stopSensor() {
-  app.sensing = false;
-  window.removeEventListener('devicemotion', onMotion);
-  document.getElementById('sensor-dot').classList.remove('on');
-  document.getElementById('sensor-text').textContent = '센서 비활성화';
-  const btn = document.getElementById('btn-sensor');
-  btn.textContent = '감지 시작'; btn.classList.remove('stop');
-  if (app._activeTimer) clearInterval(app._activeTimer);
-}
-
-function useFallback() {
-  document.getElementById('sensor-text').textContent = '수동 입력 모드';
-  const btn = document.getElementById('btn-sensor');
-  btn.textContent = '+100 걸음';
-  btn.classList.remove('stop');
-  btn.onclick = () => { addSteps(100); };
-}
-
-function onMotion(e) {
-  const acc = e.accelerationIncludingGravity;
-  if (!acc) return;
-  const mag = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
-  app._accBuf.push(mag);
-  if (app._accBuf.length > 6) app._accBuf.shift();
-  const avg = app._accBuf.reduce((a, b) => a + b, 0) / app._accBuf.length;
-  const now = Date.now();
-  if (mag > avg + 11 && now - app._lastStep > 320) {
-    app._lastStep = now;
-    addSteps(1);
-  }
-}
-
-function addSteps(n) {
-  app.steps += n;
-  updateUI();
-  // 로컬 저장 (즉시)
+async function loadRanking(cat) {
+  const el=document.getElementById('rank-content');
+  const info=CATS[cat];
+  el.innerHTML='<div class="rank-list"><div class="rank-empty">불러오는 중...</div></div>';
   try {
-    localStorage.setItem('contec_steps', JSON.stringify({
-      ym: getYearMonth(), steps: app.steps, name: app.name
-    }));
-  } catch(e) {}
-  // Supabase 저장 (5걸음마다 또는 수동입력시)
-  if (n >= 100 || app.steps % 5 === 0) {
-    SB.saveSteps(app.name, app.steps).then(() => loadRanking());
-  }
-}
-
-// ═══════════════════════════════════════════
-//  UI 업데이트
-// ═══════════════════════════════════════════
-function updateUI() {
-  const s = app.steps;
-  const pct = Math.min(100, Math.round(s / CONFIG.goal * 100));
-  const circ = 2 * Math.PI * 78;
-
-  document.getElementById('disp-steps').textContent = s.toLocaleString('ko-KR');
-  document.getElementById('disp-pct').textContent = pct + '% 달성';
-  document.getElementById('ring-prog').style.strokeDashoffset = (circ * (1 - pct / 100)).toFixed(2);
-  document.getElementById('disp-dist').textContent = (s * 0.00075).toFixed(2);
-  document.getElementById('disp-cal').textContent = Math.round(s * 0.04);
-}
-
-// ═══════════════════════════════════════════
-//  랭킹 (Supabase 연동)
-// ═══════════════════════════════════════════
-async function loadRanking() {
-  const el = document.getElementById('rank-list');
-  try {
-    const list = await SB.getRanking();
-    if (!list.length) {
-      el.innerHTML = '<div class="rank-empty">이번 달 아직 참가자가 없습니다</div>';
-      return;
-    }
-    const maxSteps = list[0]?.steps || 1;
-    const ym = getYearMonth();
-    const [y, m] = ym.split('-');
-    el.innerHTML = list.map((r, i) => {
-      const rank = i + 1;
-      const isMe = r.name === app.name;
-      const numCls = rank <= 3 ? 'r' + rank : '';
-      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
-      const barPct = Math.round(r.steps / maxSteps * 100);
-      const init = r.name.slice(0, 1) + '○';
-      return `
-      <div class="rank-row ${isMe ? 'is-me' : ''}">
-        <div class="rank-num ${numCls}">${typeof medal === 'string' ? medal : rank}</div>
-        <div class="rank-avatar">${init}</div>
+    const list=await SB.ranking(getYM(),cat);
+    if(!list.length){el.innerHTML='<div class="rank-list"><div class="rank-empty">이번 달 기록이 없습니다</div></div>';return;}
+    const max=list[0]?.val||1;
+    const [y,m]=getYM().split('-');
+    el.innerHTML='<div class="rank-list">'+list.map((r,i)=>{
+      const rank=i+1, isMe=r.name===app.name;
+      const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+      const pct=Math.round(r.val/max*100);
+      const disp=cat==='sleep'?(r.val/r.cnt).toFixed(1):r.val.toLocaleString('ko-KR');
+      const unitLabel=cat==='sleep'?'시간 평균':info.unit;
+      return `<div class="rank-row ${isMe?'is-me':''}">
+        <div class="rank-num ${rank<=3?'r'+rank:''}">${typeof medal==='string'?medal:rank}</div>
+        <div class="rank-avatar">${r.name.slice(0,1)}○</div>
         <div class="rank-info">
-          <div class="rank-name">${r.name}${isMe ? ' (나)' : ''}</div>
-          <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${barPct}%"></div></div>
+          <div class="rank-name">${r.name}${isMe?' (나)':''}</div>
+          <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${pct}%;background:${info.color}"></div></div>
         </div>
-        <div class="rank-steps">
-          <div class="rank-steps-num">${r.steps.toLocaleString('ko-KR')}</div>
-          <div class="rank-steps-lbl">걸음</div>
+        <div class="rank-val">
+          <div class="rank-val-num" style="color:${info.color}">${disp}</div>
+          <div class="rank-val-unit">${unitLabel}</div>
         </div>
       </div>`;
-    }).join('') + `<div style="text-align:center;padding:10px;font-size:12px;color:var(--text-hint)">${y}년 ${m}월 누적 랭킹</div>`;
-  } catch(e) {
-    el.innerHTML = '<div class="rank-empty">랭킹을 불러오는 중...</div>';
+    }).join('')+`<div class="rank-month">${y}년 ${m}월 누적 랭킹</div></div>`;
+  } catch(e){
+    el.innerHTML='<div class="rank-list"><div class="rank-empty">랭킹을 불러올 수 없습니다</div></div>';
   }
 }
 
-function renderRanking() { loadRanking(); }
+// ═══ 자동 로그인 ═══
+(function() {
+  try {
+    const session = JSON.parse(localStorage.getItem('contec_session') || 'null');
+    if (session && session.name) {
+      // 저장된 세션이 있으면 자동 로그인
+      document.getElementById('inp-name').value = session.name;
+      document.getElementById('inp-pw').value = CONFIG.password;
+      doLogin();
+    }
+  } catch(e) {}
+})();
 
-// ═══════════════════════════════════════════
-//  주간 차트 렌더
-// ═══════════════════════════════════════════
-function renderWeekly() {
-  const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-  const data = [...weeklyHistory];
-  data[todayIdx] = app.steps;
-  const max = Math.max(...data, 1);
-
-  document.getElementById('chart-bars').innerHTML = data.map((v, i) => {
-    const h = Math.round(v / max * 110);
-    const isToday = i === todayIdx;
-    const label = v > 0 ? (v >= 1000 ? Math.round(v / 100) / 10 + 'k' : v) : '';
-    return `<div class="bar-col">
-      <div class="bar-val">${label}</div>
-      <div class="bar-body ${isToday ? 'today' : ''}" style="height:${h}px"></div>
-    </div>`;
-  }).join('');
-
-  document.getElementById('chart-days').innerHTML = DAYS.map((d, i) =>
-    `<div class="day-lbl ${i === todayIdx ? 'today' : ''}">${d}</div>`
-  ).join('');
-}
-
-// 초기 UI
-updateUI();
-
-// ═══════════════════════════════════════════
-//  PWA 서비스워커 등록
-// ═══════════════════════════════════════════
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  });
-}
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
