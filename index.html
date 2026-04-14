@@ -179,7 +179,13 @@
       <button class="login-tab active" id="tab-user" data-active="true" onclick="switchLoginTab('user')">👤 직원</button>
       <button class="login-tab" id="tab-admin" data-active="false" onclick="switchLoginTab('admin')">⚙️ 관리자</button>
     </div>
-    <div class="field"><label>이름</label><input type="text" id="inp-name" placeholder="홍길동" autocomplete="name"/></div>
+    <div class="field" id="field-empno">
+      <label>사번</label>
+      <input type="text" id="inp-empno" placeholder="사번 입력" autocomplete="off" oninput="lookupEmpNo()"/>
+      <div id="emp-found" style="font-size:13px;color:#7df;margin-top:6px;display:none;">👤 <span id="emp-found-name"></span></div>
+      <div id="emp-notfound" style="font-size:12px;color:#ff8080;margin-top:6px;display:none;">등록되지 않은 사번입니다</div>
+    </div>
+    <div class="field" id="field-name-admin" style="display:none;"><label>이름</label><input type="text" id="inp-name" placeholder="홍길동" autocomplete="name"/></div>
     <div class="field">
       <label>접속 암호</label>
       <div class="pw-wrap">
@@ -211,6 +217,19 @@
       <div class="mb-tag">매월 1일 리셋</div>
     </div>
     <div class="sec-title">챌린지 참여하기</div>
+    <div style="background:var(--card);border-radius:16px;border:1.5px solid var(--border);padding:1.25rem;margin-bottom:1.25rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:14px;font-weight:700;color:var(--navy);">🔐 내 계정</div>
+        <button onclick="togglePwChange()" style="font-size:12px;color:var(--sky);background:none;border:none;cursor:pointer;font-family:inherit;font-weight:600;">암호 변경</button>
+      </div>
+      <div style="font-size:13px;color:var(--text-sub);" id="home-empno-display"></div>
+      <div id="pw-change-form" style="display:none;margin-top:12px;">
+        <div class="m-field"><label>현재 암호</label><input type="password" id="pw-current" placeholder="현재 암호 입력"/></div>
+        <div class="m-field"><label>새 암호</label><input type="password" id="pw-new" placeholder="새 암호 입력 (4자 이상)"/></div>
+        <div class="m-field"><label>새 암호 확인</label><input type="password" id="pw-confirm" placeholder="새 암호 재입력"/></div>
+        <button class="btn-main" style="background:var(--navy);" onclick="changePassword()">암호 변경하기</button>
+      </div>
+    </div>
     <div class="home-grid">
       <div class="home-card" onclick="switchPage('quiz')">
         <div class="hc-accent" style="background:var(--purple)"></div>
@@ -350,6 +369,7 @@
       <button class="admin-tab" onclick="switchAdminTab(this,'idea-all')">💡 아이디어</button>
       <button class="admin-tab" onclick="switchAdminTab(this,'quiz-mgmt')">🚀 퀴즈관리</button>
       <button class="admin-tab" onclick="switchAdminTab(this,'race-mgmt')">🎱 레이스관리</button>
+      <button class="admin-tab" onclick="switchAdminTab(this,'emp-mgmt')">👥 직원관리</button>
     </div>
     <div id="admin-tab-pending">
       <div class="sec-title">웃수저 승인 대기 (<span id="funny-pending-cnt">0</span>)</div>
@@ -370,6 +390,24 @@
       <div class="sec-title" style="margin-top:1rem;">이번 달 등록된 문제</div>
       <div id="quiz-admin-list"></div>
     </div>
+    <!-- 직원 관리 탭 -->
+    <div id="admin-tab-emp-mgmt" style="display:none;">
+      <div class="card" style="margin-bottom:1rem;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:1rem;">👤 직원 개별 등록</div>
+        <div class="m-field"><label>사번</label><input type="text" id="new-empno" placeholder="예: 2024001"/></div>
+        <div class="m-field"><label>이름</label><input type="text" id="new-empname" placeholder="예: 홍길동"/></div>
+        <button class="btn-main" style="background:var(--navy);" onclick="addEmployee()">등록</button>
+      </div>
+      <div class="card" style="margin-bottom:1rem;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;">📋 CSV 일괄 등록</div>
+        <p style="font-size:12px;color:var(--text-hint);margin-bottom:8px;">사번,이름 형식으로 한 줄에 한 명씩 입력</p>
+        <textarea id="csv-employees" style="width:100%;height:100px;padding:10px;font-size:13px;font-family:inherit;border:1.5px solid var(--border);border-radius:10px;outline:none;background:var(--bg);color:var(--text);resize:none;" placeholder="2024001,홍길동&#10;2024002,김철수&#10;2024003,이영희"></textarea>
+        <button class="btn-main" style="background:var(--blue);margin-top:8px;" onclick="bulkAddEmployees()">일괄 등록</button>
+      </div>
+      <div class="sec-title">등록된 직원 (<span id="emp-count">0</span>명)</div>
+      <div id="emp-list"></div>
+    </div>
+
     <div id="admin-tab-race-mgmt" style="display:none;">
       <div class="card" style="margin-bottom:1rem;">
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;">🎁 이달의 경품 등록</div>
@@ -431,7 +469,7 @@ const SB = {
   async upload(file){const ext=file.name.split('.').pop();const path=Date.now()+'.'+ext;const r=await fetch(CONFIG.supabaseUrl+'/storage/v1/object/challenge-images/'+path,{method:'POST',headers:{'apikey':CONFIG.supabaseKey,'Authorization':'Bearer '+CONFIG.supabaseKey,'Content-Type':file.type},body:file});return r.ok?CONFIG.supabaseUrl+'/storage/v1/object/public/challenge-images/'+path:null;}
 };
 
-const app={name:'',isAdmin:false};
+const app={name:'',isAdmin:false,empId:null,empNo:''};
 function getYM(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
 function getWeekKey(){const d=new Date();const s=new Date(d.getFullYear(),0,1);const w=Math.ceil(((d-s)/86400000+s.getDay()+1)/7);return d.getFullYear()+'-W'+String(w).padStart(2,'0');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
@@ -441,21 +479,47 @@ document.getElementById('btn-eye').addEventListener('click',function(){const i=d
 
 function switchLoginTab(type){
   const u=document.getElementById('tab-user'),a=document.getElementById('tab-admin');
-  if(type==='user'){u.classList.add('active');u.dataset.active='true';a.classList.remove('active');a.dataset.active='false';document.getElementById('login-hint').textContent='암호를 모르시면 담당자에게 문의하세요';}
-  else{a.classList.add('active');a.dataset.active='true';u.classList.remove('active');u.dataset.active='false';document.getElementById('login-hint').textContent='관리자 전용 페이지입니다';}
+  if(type==='user'){
+    u.classList.add('active');u.dataset.active='true';a.classList.remove('active');a.dataset.active='false';
+    document.getElementById('login-hint').textContent='초기 암호는 사번과 동일합니다';
+    document.getElementById('field-empno').style.display='block';
+    document.getElementById('field-name-admin').style.display='none';
+  } else {
+    a.classList.add('active');a.dataset.active='true';u.classList.remove('active');u.dataset.active='false';
+    document.getElementById('login-hint').textContent='관리자 전용 페이지입니다';
+    document.getElementById('field-empno').style.display='none';
+    document.getElementById('field-name-admin').style.display='block';
+  }
 }
 
 async function doLogin(){
-  const name=document.getElementById('inp-name').value.trim();
   const pw=document.getElementById('inp-pw').value;
   const err=document.getElementById('login-err');
-  if(!name){err.textContent='이름을 입력해주세요';err.style.display='block';return;}
   const isAdminTab=document.getElementById('tab-admin').dataset.active==='true';
-  if(isAdminTab){if(pw!==CONFIG.adminPassword){err.textContent='관리자 암호가 올바르지 않습니다';err.style.display='block';return;}app.isAdmin=true;}
-  else{if(pw!==CONFIG.password){err.textContent='암호가 올바르지 않습니다';err.style.display='block';return;}app.isAdmin=false;}
+  let name='';
+
+  if(isAdminTab){
+    name=document.getElementById('inp-name').value.trim();
+    if(!name){err.textContent='이름을 입력해주세요';err.style.display='block';return;}
+    if(pw!==CONFIG.adminPassword){err.textContent='관리자 암호가 올바르지 않습니다';err.style.display='block';return;}
+    app.isAdmin=true;
+  } else {
+    const empno=document.getElementById('inp-empno').value.trim();
+    if(!empno){err.textContent='사번을 입력해주세요';err.style.display='block';return;}
+    if(!window._empFound){err.textContent='등록되지 않은 사번입니다';err.style.display='block';return;}
+    // 개인 암호 확인 (Supabase에서)
+    const empRows=await SB.get('employees','emp_no=eq.'+encodeURIComponent(empno)+'&is_active=eq.true');
+    if(!empRows.length){err.textContent='등록되지 않은 사번입니다';err.style.display='block';return;}
+    const empPw=empRows[0].password||empno; // 비번 없으면 사번이 기본값
+    if(pw!==empPw){err.textContent='암호가 올바르지 않습니다';err.style.display='block';return;}
+    name=empRows[0].name;
+    app.empId=empRows[0].id;
+    app.empNo=empno;
+    app.isAdmin=false;
+  }
   err.style.display='none';
   app.name=name;
-  localStorage.setItem('contec_session',JSON.stringify({name,isAdmin:app.isAdmin}));
+  const _empno=document.getElementById('inp-empno')?document.getElementById('inp-empno').value.trim():'';localStorage.setItem('contec_session',JSON.stringify({name,isAdmin:app.isAdmin,empno:_empno,empId:app.empId||null}));
   document.getElementById('disp-name').textContent=name;
   document.getElementById('mb-title').textContent=new Date().getFullYear()+'년 '+(new Date().getMonth()+1)+'월';
   if(app.isAdmin){document.getElementById('nav-user').style.display='none';document.getElementById('nav-admin').style.display='flex';switchPage('admin');}
@@ -479,7 +543,7 @@ document.getElementById('btn-logout').addEventListener('click',()=>{
 });
 
 // AUTO LOGIN
-(function(){try{const s=JSON.parse(localStorage.getItem('contec_session')||'null');if(s&&s.name){document.getElementById('inp-name').value=s.name;if(s.isAdmin){switchLoginTab('admin');document.getElementById('inp-pw').value=CONFIG.adminPassword;}else{document.getElementById('inp-pw').value=CONFIG.password;}doLogin();}}catch(e){}})();
+(function(){try{const s=JSON.parse(localStorage.getItem('contec_session')||'null');if(s&&s.name){if(s.isAdmin){switchLoginTab('admin');document.getElementById('inp-name').value=s.name;document.getElementById('inp-pw').value=CONFIG.adminPassword;}else{switchLoginTab('user');document.getElementById('inp-empno').value=s.empno||'';window._empFound=s.name;document.getElementById('emp-found-name').textContent=s.name;document.getElementById('emp-found').style.display='block';app.empId=s.empId||null;}doLogin();}}catch(e){}})();
 
 // ── PAGE SWITCH ──
 function switchPage(page){
@@ -487,6 +551,10 @@ function switchPage(page){
   const el=document.getElementById('page-'+page);if(el)el.classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+page+"'"))b.classList.add('active');});
+  if(page==='home'&&!app.isAdmin){
+    const el=document.getElementById('home-empno-display');
+    if(el)el.textContent='사번: '+app.empNo+' · '+app.name;
+  }
   if(page==='quiz')loadQuizPage();
   if(page==='funny')loadFunnyList();
   if(page==='idea')loadIdeaMyList();
@@ -671,7 +739,7 @@ async function loadAdminPage(){
 function switchAdminTab(btn,tab){
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  ['pending','funny-all','idea-all','quiz-mgmt','race-mgmt'].forEach(t=>{
+  ['pending','funny-all','idea-all','quiz-mgmt','race-mgmt','emp-mgmt'].forEach(t=>{
     const el=document.getElementById('admin-tab-'+t);
     if(el)el.style.display=t===tab?'block':'none';
   });
@@ -680,6 +748,7 @@ function switchAdminTab(btn,tab){
   if(tab==='idea-all')loadAdminIdeaAll();
   if(tab==='quiz-mgmt')loadQuizAdminList();
   if(tab==='race-mgmt'){loadAdminRewardList();SB.get('race_entries','year_month=eq.'+getYM()).then(r=>document.getElementById('race-entry-count').textContent=r.length);}
+  if(tab==='emp-mgmt')loadEmployeeList();
 }
 
 async function loadAdminPending(){
@@ -970,6 +1039,92 @@ async function saveRaceWinner(){
   if(ok){showToast('🎉 결과 저장 완료! 직원들에게 발표되었습니다');loadRacePage();}
 }
 
+// ── 암호 변경 ──
+function togglePwChange(){
+  const form=document.getElementById('pw-change-form');
+  form.style.display=form.style.display==='none'?'block':'none';
+}
+
+async function changePassword(){
+  const current=document.getElementById('pw-current').value;
+  const newPw=document.getElementById('pw-new').value;
+  const confirm=document.getElementById('pw-confirm').value;
+  if(!current||!newPw||!confirm){showToast('❌ 모든 항목을 입력해주세요');return;}
+  if(newPw.length<4){showToast('❌ 새 암호는 4자 이상이어야 합니다');return;}
+  if(newPw!==confirm){showToast('❌ 새 암호가 일치하지 않습니다');return;}
+  // 현재 암호 확인
+  const rows=await SB.get('employees','emp_no=eq.'+encodeURIComponent(app.empNo)+'&is_active=eq.true');
+  if(!rows.length){showToast('❌ 계정 정보를 찾을 수 없습니다');return;}
+  const empPw=rows[0].password||app.empNo;
+  if(current!==empPw){showToast('❌ 현재 암호가 올바르지 않습니다');return;}
+  // 암호 변경
+  const ok=await SB.patch('employees',rows[0].id,{password:newPw});
+  if(ok){
+    showToast('✅ 암호가 변경되었습니다!');
+    document.getElementById('pw-current').value='';
+    document.getElementById('pw-new').value='';
+    document.getElementById('pw-confirm').value='';
+    document.getElementById('pw-change-form').style.display='none';
+  } else {showToast('❌ 변경 실패');}
+}
+
+// ── 직원 관리 ──
+async function addEmployee(){
+  const empno=document.getElementById('new-empno').value.trim();
+  const name=document.getElementById('new-empname').value.trim();
+  if(!empno||!name){showToast('❌ 사번과 이름을 입력해주세요');return;}
+  const existing=await SB.get('employees','emp_no=eq.'+encodeURIComponent(empno));
+  if(existing.length>0){showToast('❌ 이미 등록된 사번입니다');return;}
+  const ok=await SB.post('employees',{emp_no:empno,name,is_active:true});
+  if(ok){showToast('✅ 등록 완료!');document.getElementById('new-empno').value='';document.getElementById('new-empname').value='';loadEmployeeList();}
+  else showToast('❌ 등록 실패');
+}
+
+async function bulkAddEmployees(){
+  const csv=document.getElementById('csv-employees').value.trim();
+  if(!csv){showToast('❌ 내용을 입력해주세요');return;}
+  const lines=csv.split('\n').map(l=>l.trim()).filter(l=>l);
+  let success=0,fail=0;
+  for(const line of lines){
+    const parts=line.split(',').map(p=>p.trim());
+    if(parts.length<2){fail++;continue;}
+    const [empno,...nameParts]=parts;
+    const name=nameParts.join(',');
+    if(!empno||!name){fail++;continue;}
+    const existing=await SB.get('employees','emp_no=eq.'+encodeURIComponent(empno));
+    if(existing.length>0){fail++;continue;}
+    const ok=await SB.post('employees',{emp_no:empno,name,is_active:true});
+    if(ok)success++;else fail++;
+  }
+  showToast(`✅ ${success}명 등록 완료${fail>0?' ('+fail+'명 실패/중복)':''}`);
+  document.getElementById('csv-employees').value='';
+  loadEmployeeList();
+}
+
+async function loadEmployeeList(){
+  const rows=await SB.get('employees','order=emp_no.asc');
+  document.getElementById('emp-count').textContent=rows.filter(r=>r.is_active).length;
+  const el=document.getElementById('emp-list');
+  el.innerHTML=rows.length?rows.map(r=>`
+    <div style="background:var(--card);border-radius:12px;border:1px solid var(--border);padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <span style="font-size:12px;font-weight:700;color:var(--navy);">${r.emp_no}</span>
+        <span style="font-size:13px;color:var(--text);margin-left:10px;">${r.name}</span>
+        ${!r.is_active?'<span style="font-size:10px;color:var(--red);margin-left:6px;">비활성</span>':''}
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button onclick="toggleEmployee('${r.id}',${r.is_active})" style="padding:4px 10px;background:${r.is_active?'#e65100':'var(--green)'};color:#fff;border:none;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">${r.is_active?'비활성화':'활성화'}</button>
+        <button onclick="SB.del('employees','${r.id}').then(()=>{showToast('🗑️ 삭제됨');loadEmployeeList();})" style="padding:4px 10px;background:#888;color:#fff;border:none;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">🗑️</button>
+      </div>
+    </div>`).join(''):'<div class="rank-empty" style="background:var(--card);border-radius:12px;">등록된 직원이 없습니다</div>';
+}
+
+async function toggleEmployee(id,current){
+  await SB.patch('employees',id,{is_active:!current});
+  showToast(current?'비활성화됨':'활성화됨');
+  loadEmployeeList();
+}
+
 // ── USER RACE REPLAY ──
 let userRaceAnimId=null;
 
@@ -1077,6 +1232,30 @@ async function playUserRace(){
   function loop(){for(let s=0;s<3;s++)update();draw();if(!done)userRaceAnimId=requestAnimationFrame(loop);}
   if(userRaceAnimId)cancelAnimationFrame(userRaceAnimId);
   loop();
+}
+
+// ── 사번 조회 ──
+let _empLookupTimer=null;
+async function lookupEmpNo(){
+  const empno=document.getElementById('inp-empno').value.trim();
+  clearTimeout(_empLookupTimer);
+  document.getElementById('emp-found').style.display='none';
+  document.getElementById('emp-notfound').style.display='none';
+  window._empFound=null;
+  if(!empno) return;
+  _empLookupTimer=setTimeout(async()=>{
+    const rows=await SB.get('employees','emp_no=eq.'+encodeURIComponent(empno)+'&is_active=eq.true');
+    if(rows.length>0){
+      window._empFound=rows[0].name;
+      document.getElementById('emp-found-name').textContent=rows[0].name;
+      document.getElementById('emp-found').style.display='block';
+      document.getElementById('emp-notfound').style.display='none';
+    } else {
+      window._empFound=null;
+      document.getElementById('emp-found').style.display='none';
+      document.getElementById('emp-notfound').style.display='block';
+    }
+  },400);
 }
 
 // ── HELPERS ──
