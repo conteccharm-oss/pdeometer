@@ -724,36 +724,56 @@ async function loadQuizPage(){
 
   if(elim.length>0){el.innerHTML=`<div style="background:#fff5f5;border:1.5px solid #ffcccc;border-radius:16px;padding:1.5rem;text-align:center;"><div style="font-size:36px;margin-bottom:8px;">💥</div><div style="font-size:16px;font-weight:700;color:var(--red);">이번 달 탈락!</div><div style="font-size:12px;color:var(--text-sub);margin-top:4px;">다음 달 챌린지에서 다시 도전하세요</div></div>`;return;}
 
-  // scheduled_week 기준 자동 로딩, 없으면 week_key fallback
-  let quizzes=await SB.get('quiz_relay','scheduled_week=eq.'+wk+'&order=created_at.desc&limit=1');
-  if(!quizzes.length) quizzes=await SB.get('quiz_relay','year_month=eq.'+ym+'&week_key=eq.'+wk+'&is_active=eq.true&order=created_at.desc&limit=1');
-  const quiz=quizzes[0];
-  let alreadyAnswered=false,myCorrect=false;
-  if(quiz){const my=await SB.get('quiz_attempts','name=eq.'+encodeURIComponent(app.name)+'&quiz_id=eq.'+quiz.id);alreadyAnswered=my.length>0;myCorrect=my.some(a=>a.is_correct);}
+  // 이번 주 문제 풀 로드 (여러 개 가능)
+  let pool=await SB.get('quiz_relay','scheduled_week=eq.'+wk+'&is_active=eq.true&order=created_at.asc');
+  if(!pool.length) pool=await SB.get('quiz_relay','year_month=eq.'+ym+'&week_key=eq.'+wk+'&is_active=eq.true&order=created_at.asc');
 
   let html='';
-  if(quiz){
-    html+=`<div class="quiz-card"><div style="font-size:11px;font-weight:700;color:var(--text-hint);margin-bottom:8px;">📌 이번 주 문제 · ${quiz.created_by}님 출제</div><div style="font-size:16px;font-weight:600;color:var(--text);line-height:1.5;">${quiz.question}</div>${quiz.hint?`<div style="font-size:12px;color:var(--text-sub);margin-top:6px;">힌트: ${quiz.hint}</div>`:''}</div>`;
-    if(alreadyAnswered){
-      const bg=myCorrect?'#e8f5e9':'#ffebee';const bc=myCorrect?'#a5d6a7':'#ffcdd2';const msg=myCorrect?'✅ 정답! 생존 중입니다 🎉':'💥 이번 주 탈락했습니다';const color=myCorrect?'#1b5e20':'#b71c1c';
-      html+=`<div style="background:${bg};border:1.5px solid ${bc};border-radius:16px;padding:1.25rem;text-align:center;"><div style="font-size:14px;font-weight:700;color:${color};">${msg}</div><div style="font-size:12px;color:var(--text-hint);margin-top:4px;">다음 주 문제를 기다려주세요</div></div>`;
-    } else {
-      const qt=getQuizTime();
-      const isMulti=quiz.quiz_type==='multiple';
-      let inputHtml='';
-      if(isMulti){
-        const opts=[quiz.option_a,quiz.option_b,quiz.option_c,quiz.option_d].filter(Boolean);
-        // 보기 랜덤 셔플
-        for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
-        inputHtml=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">${opts.map(o=>`<button class="btn-choice" onclick="submitAnswerChoice('${quiz.id}','${quiz.answer.replace(/'/g,"\\'")}','${o.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}</div>`;
-      } else {
-        inputHtml=`<div class="quiz-input-wrap"><input type="text" class="quiz-input" id="quiz-ans" placeholder="정답 입력..." onkeydown="if(event.key==='Enter')submitAnswer('${quiz.id}','${quiz.answer.replace(/'/g,"\\'")}')"/><button class="btn-answer" onclick="submitAnswer('${quiz.id}','${quiz.answer.replace(/'/g,"\\'")}')">제출</button></div>`;
-      }
-      html+=`<div class="quiz-card" id="quiz-card-container"><div style="font-size:12px;color:var(--text-hint);margin-bottom:4px;text-align:center;">⏱ ${qt}초 안에 답하세요!</div><div class="quiz-timer" id="quiz-timer">${qt}.0</div><div class="tension-bar"><div class="tension-fill" id="quiz-tension-fill"></div></div>${inputHtml}</div>`;
-      setTimeout(()=>startTimer(quiz.id,quiz.answer),100);
-    }
+  if(!pool.length){
+    html=`<div class="quiz-card" style="text-align:center;padding:2rem;"><div style="font-size:32px;margin-bottom:8px;">🚀</div><div style="font-size:14px;font-weight:700;color:var(--navy);">이번 주 문제가 없어요</div><div style="font-size:12px;color:var(--text-hint);margin-top:4px;">관리자가 매주 문제를 등록합니다</div></div>`;
+    el.innerHTML=html;return;
+  }
+
+  // 이미 이번 주 풀에서 답한 적 있는지 확인
+  const poolIds=pool.map(q=>q.id);
+  const myAttempts=await SB.get('quiz_attempts','name=eq.'+encodeURIComponent(app.name)+'&quiz_id=in.('+poolIds.join(',')+')');
+  let quiz,alreadyAnswered=false,myCorrect=false;
+
+  if(myAttempts.length){
+    // 이미 답한 문제 그대로 보여줌
+    alreadyAnswered=true;
+    myCorrect=myAttempts.some(a=>a.is_correct);
+    quiz=pool.find(q=>q.id===myAttempts[0].quiz_id)||pool[0];
   } else {
-    html+=`<div class="quiz-card" style="text-align:center;padding:2rem;"><div style="font-size:32px;margin-bottom:8px;">🚀</div><div style="font-size:14px;font-weight:700;color:var(--navy);">이번 주 문제가 없어요</div><div style="font-size:12px;color:var(--text-hint);margin-top:4px;">관리자가 매주 문제를 등록합니다</div></div>`;
+    // 개인별 랜덤 배정 (localStorage로 고정, 새로고침해도 동일 문제)
+    const assignKey='quiz_assign_'+wk+'_'+app.name;
+    let assignedId=localStorage.getItem(assignKey);
+    if(!assignedId||!pool.find(q=>q.id===assignedId)){
+      // 랜덤 배정
+      assignedId=pool[Math.floor(Math.random()*pool.length)].id;
+      localStorage.setItem(assignKey,assignedId);
+    }
+    quiz=pool.find(q=>q.id===assignedId)||pool[0];
+  }
+
+  html+=`<div class="quiz-card"><div style="font-size:11px;font-weight:700;color:var(--text-hint);margin-bottom:8px;">📌 이번 주 문제 · ${quiz.created_by}님 출제</div><div style="font-size:16px;font-weight:600;color:var(--text);line-height:1.5;">${quiz.question}</div>${quiz.hint?`<div style="font-size:12px;color:var(--text-sub);margin-top:6px;">힌트: ${quiz.hint}</div>`:''}</div>`;
+
+  if(alreadyAnswered){
+    const bg=myCorrect?'#e8f5e9':'#ffebee';const bc=myCorrect?'#a5d6a7':'#ffcdd2';const msg=myCorrect?'✅ 정답! 생존 중입니다 🎉':'💥 이번 주 탈락했습니다';const color=myCorrect?'#1b5e20':'#b71c1c';
+    html+=`<div style="background:${bg};border:1.5px solid ${bc};border-radius:16px;padding:1.25rem;text-align:center;"><div style="font-size:14px;font-weight:700;color:${color};">${msg}</div><div style="font-size:12px;color:var(--text-hint);margin-top:4px;">다음 주 문제를 기다려주세요</div></div>`;
+  } else {
+    const qt=getQuizTime();
+    const isMulti=quiz.quiz_type==='multiple';
+    let inputHtml='';
+    if(isMulti){
+      const opts=[quiz.option_a,quiz.option_b,quiz.option_c,quiz.option_d].filter(Boolean);
+      for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
+      inputHtml=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">${opts.map(o=>`<button class="btn-choice" onclick="submitAnswerChoice('${quiz.id}','${quiz.answer.replace(/'/g,"\\'")}','${o.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}</div>`;
+    } else {
+      inputHtml=`<div class="quiz-input-wrap"><input type="text" class="quiz-input" id="quiz-ans" placeholder="정답 입력..." onkeydown="if(event.key==='Enter')submitAnswer('${quiz.id}','${quiz.answer.replace(/'/g,"\\'")}')"/><button class="btn-answer" onclick="submitAnswer('${quiz.id}','${quiz.answer.replace(/'/g,"\\'")}')">제출</button></div>`;
+    }
+    html+=`<div class="quiz-card" id="quiz-card-container"><div style="font-size:12px;color:var(--text-hint);margin-bottom:4px;text-align:center;">⏱ ${qt}초 안에 답하세요!</div><div class="quiz-timer" id="quiz-timer">${qt}.0</div><div class="tension-bar"><div class="tension-fill" id="quiz-tension-fill"></div></div>${inputHtml}</div>`;
+    setTimeout(()=>startTimer(quiz.id,quiz.answer),100);
   }
   el.innerHTML=html;
 }
@@ -887,8 +907,6 @@ async function registerQuiz(){
       showToast('❌ 정답이 보기 중에 없습니다. 정답과 보기 중 하나가 정확히 일치해야 합니다');return;
     }
   }
-  const ex=await SB.get('quiz_relay','scheduled_week=eq.'+wk);
-  if(ex.length>0){showToast('❌ 해당 주차에 이미 문제가 있습니다');return;}
   const ok=await SB.post('quiz_relay',{
     year_month:getYM(),week_key:wk,scheduled_week:wk,
     question:q,answer:a,hint:h,
@@ -901,6 +919,8 @@ async function registerQuiz(){
     ['q-question','q-answer','q-hint','q-opt-a','q-opt-b','q-opt-c','q-opt-d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     populateWeekSelect();
     loadQuizAdminList();
+  } else {
+    showToast('❌ 등록 실패 — Supabase SQL 마이그레이션을 먼저 실행해주세요');
   }
 }
 
