@@ -724,9 +724,9 @@ async function loadQuizPage(){
 
   if(elim.length>0){el.innerHTML=`<div style="background:#fff5f5;border:1.5px solid #ffcccc;border-radius:16px;padding:1.5rem;text-align:center;"><div style="font-size:36px;margin-bottom:8px;">💥</div><div style="font-size:16px;font-weight:700;color:var(--red);">이번 달 탈락!</div><div style="font-size:12px;color:var(--text-sub);margin-top:4px;">다음 달 챌린지에서 다시 도전하세요</div></div>`;return;}
 
-  // 이번 주 문제 풀 로드 (여러 개 가능)
-  let pool=await SB.get('quiz_relay','scheduled_week=eq.'+wk+'&is_active=eq.true&order=created_at.asc');
-  if(!pool.length) pool=await SB.get('quiz_relay','year_month=eq.'+ym+'&week_key=eq.'+wk+'&is_active=eq.true&order=created_at.asc');
+  // 이번 주 문제 풀 로드 (week_key 우선, scheduled_week 폴백)
+  let pool=await SB.get('quiz_relay','week_key=eq.'+wk+'&is_active=eq.true&order=created_at.asc');
+  if(!pool.length) pool=await SB.get('quiz_relay','scheduled_week=eq.'+wk+'&is_active=eq.true&order=created_at.asc');
 
   let html='';
   if(!pool.length){
@@ -756,7 +756,11 @@ async function loadQuizPage(){
     quiz=pool.find(q=>q.id===assignedId)||pool[0];
   }
 
-  html+=`<div class="quiz-card"><div style="font-size:11px;font-weight:700;color:var(--text-hint);margin-bottom:8px;">📌 이번 주 문제 · ${quiz.created_by}님 출제</div><div style="font-size:16px;font-weight:600;color:var(--text);line-height:1.5;">${quiz.question}</div>${quiz.hint?`<div style="font-size:12px;color:var(--text-sub);margin-top:6px;">힌트: ${quiz.hint}</div>`:''}</div>`;
+  const poolIdx=pool.findIndex(q=>q.id===quiz.id)+1;
+  const poolBadge=pool.length>1
+    ?`<span style="font-size:10px;background:rgba(162,123,255,0.2);color:var(--purple);border:1px solid rgba(162,123,255,0.4);border-radius:8px;padding:2px 7px;margin-left:6px;">풀 ${pool.length}개 중 #${poolIdx}</span>`
+    :'';
+  html+=`<div class="quiz-card"><div style="font-size:11px;font-weight:700;color:var(--text-hint);margin-bottom:8px;display:flex;align-items:center;flex-wrap:wrap;gap:4px;">📌 이번 주 문제 · ${quiz.created_by}님 출제${poolBadge}</div><div style="font-size:16px;font-weight:600;color:var(--text);line-height:1.5;">${quiz.question}</div>${quiz.hint?`<div style="font-size:12px;color:var(--text-sub);margin-top:6px;">힌트: ${quiz.hint}</div>`:''}</div>`;
 
   if(alreadyAnswered){
     const bg=myCorrect?'#e8f5e9':'#ffebee';const bc=myCorrect?'#a5d6a7':'#ffcdd2';const msg=myCorrect?'✅ 정답! 생존 중입니다 🎉':'💥 이번 주 탈락했습니다';const color=myCorrect?'#1b5e20':'#b71c1c';
