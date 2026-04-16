@@ -1,4 +1,4 @@
-const CACHE = 'contec-challenge-v29';
+const CACHE = 'contec-challenge-v30';
 const ASSETS = ['/pdeometer/','/pdeometer/index.html','/pdeometer/logo.png','/pdeometer/manifest.json','/pdeometer/icon-192.png','/pdeometer/icon-512.png'];
 
 self.addEventListener('install', e => {
