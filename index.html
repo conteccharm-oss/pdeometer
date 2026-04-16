@@ -1393,13 +1393,14 @@ async function loadSurvivorList(){
   // 탈락자 (이름 기준 중복 제거)
   const elimAll=await SB.get('quiz_attempts','year_month=eq.'+ym+'&is_correct=eq.false');
   const elimSet=new Set(elimAll.map(a=>a.name));
-  // 정답자
+  // 정답자 (이번 달 정답 맞춘 사람)
   const correctAll=await SB.get('quiz_attempts','year_month=eq.'+ym+'&is_correct=eq.true');
-  const correctSet=new Set(correctAll.map(a=>a.name));
-  // 생존자 = 전체 - 탈락자
-  const survivors=empAll.filter(e=>!elimSet.has(e.name));
+  const survivors=correctAll.filter(a=>!elimSet.has(a.name));
+  // 이름 중복 제거
+  const seenSurv=new Set();
+  const uniqueSurvivors=survivors.filter(a=>{if(seenSurv.has(a.name))return false;seenSurv.add(a.name);return true;});
   const total=empAll.length;
-  const alive=survivors.length;
+  const alive=uniqueSurvivors.length;
   const elim=elimSet.size;
   // 통계 업데이트
   const tEl=document.getElementById('quiz-stat-total');
@@ -1408,20 +1409,24 @@ async function loadSurvivorList(){
   if(tEl)tEl.textContent=total;
   if(aEl)aEl.textContent=alive;
   if(eEl)eEl.textContent=elim;
-  // 생존자 목록 렌더링
+  // 생존자 목록 렌더링 (정답 맞춘 사람만)
   const listEl=document.getElementById('survivor-list');
   if(!listEl)return;
-  if(!survivors.length){
-    listEl.innerHTML='<div style="text-align:center;color:var(--text-hint);font-size:13px;padding:12px;">생존자가 없습니다 💥</div>';
+  if(!uniqueSurvivors.length){
+    listEl.innerHTML='<div style="text-align:center;color:var(--text-hint);font-size:13px;padding:12px;">아직 생존자가 없습니다</div>';
     return;
   }
-  listEl.innerHTML=survivors.map(e=>{
-    const answered=correctSet.has(e.name);
-    return `<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:9px 14px;margin-bottom:6px;">
-      <span style="font-size:13px;font-weight:700;color:#fff;">🟢 ${e.name}</span>
-      <span style="font-size:11px;color:${answered?'#00ff88':'var(--text-hint)'};">${answered?'✅ 정답':'미참여'}</span>
-    </div>`;
-  }).join('');
+  listEl.innerHTML=uniqueSurvivors.map(a=>`<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:9px 14px;margin-bottom:6px;">
+    <span style="font-size:13px;font-weight:700;color:#fff;">🟢 ${a.name}</span>
+    <button onclick="resetOneSurvivor('${encodeURIComponent(a.name)}')" style="padding:5px 11px;background:rgba(226,75,74,0.15);color:var(--red);border:1px solid rgba(226,75,74,0.35);border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;">리셋</button>
+  </div>`).join('');
+}
+
+async function resetOneSurvivor(encodedName){
+  const ym=getYM();
+  const ok=await SB.delWhere('quiz_attempts','year_month=eq.'+ym+'&name=eq.'+encodedName+'&is_correct=eq.true');
+  if(ok){showToast('🔄 리셋 완료!');loadSurvivorList();}
+  else showToast('❌ 리셋 실패');
 }
 
 function toggleSurvivorList(){
