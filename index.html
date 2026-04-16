@@ -445,10 +445,25 @@
           <button id="join-btn" class="btn-main" style="background:var(--navy);width:auto;padding:10px 28px;" onclick="joinRace()">참여하기</button>
         </div>
       </div>
-      <div id="race-joined-badge" style="display:none;background:linear-gradient(135deg,#001a10,#002a18);border:1.5px solid rgba(0,220,120,0.4);border-radius:12px;padding:1rem;text-align:center;margin-top:1rem;box-shadow:0 0 14px rgba(0,200,100,0.1);">
-        <div style="font-size:20px;margin-bottom:4px;">🛸</div>
-        <div style="font-size:13px;font-weight:700;color:#00ff88;text-shadow:0 0 8px rgba(0,255,136,0.5);">이번 달 레이스 참여 완료!</div>
-        <div id="race-joined-sub" style="font-size:11px;color:rgba(180,255,200,0.6);margin-top:2px;">매월 25일 자동 운영됩니다</div>
+      <div id="race-joined-badge" style="display:none;margin-top:1rem;">
+        <!-- 참여 완료 -->
+        <div style="background:linear-gradient(135deg,#001a10,#002a18);border:1.5px solid rgba(0,220,120,0.4);border-radius:12px;padding:1rem 1.25rem;text-align:center;margin-bottom:10px;box-shadow:0 0 14px rgba(0,200,100,0.1);">
+          <div style="font-size:20px;margin-bottom:4px;">🛸</div>
+          <div style="font-size:13px;font-weight:700;color:#00ff88;text-shadow:0 0 8px rgba(0,255,136,0.5);">이번 달 레이스 참여 완료!</div>
+          <div id="race-joined-sub" style="font-size:12px;color:rgba(180,255,200,0.7);margin-top:4px;font-weight:600;"></div>
+        </div>
+        <!-- 100% 랜덤 안내 -->
+        <div style="background:linear-gradient(135deg,#080010,#0d0020);border:1.5px solid rgba(160,80,255,0.45);border-radius:12px;padding:1.1rem 1.25rem;box-shadow:0 0 18px rgba(140,60,255,0.15);">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:18px;">🎲</span>
+            <span style="font-size:13px;font-weight:900;color:#c084fc;letter-spacing:0.5px;">100% 랜덤 추첨</span>
+          </div>
+          <div style="font-size:12px;color:rgba(210,180,255,0.85);line-height:1.8;">
+            지정된 날짜·시간에 <strong style="color:#c084fc;">시스템이 자동으로</strong> 레이스를 진행합니다.<br>
+            인위적인 조작이 <strong style="color:#f87171;">불가능한 완전 랜덤</strong> 방식으로,<br>
+            참여자 모두에게 <strong style="color:#c084fc;">동등한 당첨 확률</strong>이 보장됩니다.
+          </div>
+        </div>
       </div>
     </div>
 
@@ -494,10 +509,14 @@
       <!-- 당첨자 공개 (애니메이션 후) -->
       <div id="race-result-box" style="display:none;background:linear-gradient(135deg,#0a0820,#12082a,#0a1030);border-radius:16px;border:2px solid rgba(255,200,0,0.5);padding:1.5rem;text-align:center;box-shadow:0 0 30px rgba(255,180,0,0.15),inset 0 0 30px rgba(100,0,200,0.08);">
         <div style="font-size:42px;margin-bottom:8px;filter:drop-shadow(0 0 12px gold);">🏆</div>
-        <div style="font-size:10px;color:rgba(255,200,0,0.7);letter-spacing:3px;margin-bottom:6px;font-weight:700;">✦ MISSION COMPLETE ✦</div>
-        <div style="font-size:26px;font-weight:900;color:#FFD700;text-shadow:0 0 16px rgba(255,200,0,0.7);" id="race-winner-name"></div>
-        <div style="font-size:12px;color:rgba(255,220,100,0.6);margin-top:6px;letter-spacing:1px;">궤도 레이스 최후 생존자</div>
+        <div style="font-size:10px;color:rgba(255,200,0,0.7);letter-spacing:3px;margin-bottom:10px;font-weight:700;">✦ MISSION COMPLETE ✦</div>
+        <div id="race-winner-display"></div>
         <button class="btn-main" style="background:linear-gradient(135deg,#0a0820,#1a0a3a);border:1px solid rgba(0,200,255,0.3);width:auto;padding:10px 24px;margin-top:1rem;color:#00eeff;box-shadow:0 0 10px rgba(0,200,255,0.2);" onclick="playUserRace()">🛸 레이스 다시보기</button>
+      </div>
+      <!-- 관리자 전용 추가 액션 -->
+      <div id="race-admin-result-actions" style="display:none;gap:8px;margin-top:1rem;">
+        <button onclick="addExtraRace()" style="flex:1;padding:10px 0;font-size:13px;font-weight:700;font-family:inherit;border-radius:10px;border:1.5px solid rgba(0,200,255,0.35);cursor:pointer;background:rgba(0,100,200,0.2);color:#00eeff;">➕ 추가 추첨</button>
+        <button onclick="resetRaceMonth()" style="flex:1;padding:10px 0;font-size:13px;font-weight:700;font-family:inherit;border-radius:10px;border:1.5px solid rgba(226,75,74,0.4);cursor:pointer;background:rgba(226,75,74,0.1);color:var(--red);">🔄 리셋</button>
       </div>
     </div>
   </div>
@@ -568,7 +587,11 @@
         <div class="m-field"><label>힌트 (선택)</label><input type="text" id="q-hint" placeholder="예: 1969년 NASA 미션"/></div>
         <button class="btn-main" style="background:var(--purple);" onclick="registerQuiz()">등록하기</button>
       </div>
-      <div class="sec-title" style="margin-top:1rem;">이번 달 등록된 문제</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;margin-bottom:0.75rem;background:rgba(0,0,0,0.2);border-radius:12px;padding:8px 12px;">
+        <button onclick="quizHistoryNav('prev')" style="background:none;border:none;color:var(--text-sub);font-size:18px;cursor:pointer;padding:2px 8px;font-family:inherit;">◀</button>
+        <span id="quiz-history-month-label" style="font-size:13px;font-weight:700;color:var(--sky);"></span>
+        <button onclick="quizHistoryNav('next')" id="quiz-history-next-btn" style="background:none;border:none;color:var(--text-sub);font-size:18px;cursor:pointer;padding:2px 8px;font-family:inherit;">▶</button>
+      </div>
       <div id="quiz-admin-list"></div>
       <!-- 탈락자 관리 -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;margin-bottom:0.5rem;">
@@ -656,10 +679,16 @@
       </div>
 
       <!-- 이번 달 완료 표시 -->
-      <div id="race-admin-done-notice" style="display:none;background:linear-gradient(135deg,#001a10,#002a18);border:1.5px solid rgba(0,220,120,0.4);border-radius:12px;padding:1rem;text-align:center;margin-bottom:1rem;">
-        <div style="font-size:18px;margin-bottom:4px;">✅</div>
-        <div style="font-size:13px;font-weight:700;color:#00ff88;">이번 달 레이스 완료</div>
-        <div id="race-admin-done-winner" style="font-size:12px;color:rgba(180,255,200,0.7);margin-top:4px;"></div>
+      <div id="race-admin-done-notice" style="display:none;background:linear-gradient(135deg,#001a10,#002a18);border:1.5px solid rgba(0,220,120,0.4);border-radius:12px;padding:1rem;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+          <span style="font-size:16px;">✅</span>
+          <span style="font-size:13px;font-weight:700;color:#00ff88;">이번 달 레이스 완료</span>
+        </div>
+        <div id="race-admin-done-list" style="margin-bottom:12px;"></div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="addExtraRace()" style="flex:1;padding:9px 0;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;border:1.5px solid rgba(0,200,255,0.35);cursor:pointer;background:rgba(0,100,200,0.2);color:#00eeff;">➕ 추가 추첨</button>
+          <button onclick="resetRaceMonth()" style="flex:1;padding:9px 0;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;border:1.5px solid rgba(226,75,74,0.4);cursor:pointer;background:rgba(226,75,74,0.1);color:var(--red);">🔄 리셋</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1220,37 +1249,82 @@ async function registerQuiz(){
   }
 }
 
+let quizHistoryMonth=getYM();
+
+function getWeekKeyFromDate(d){
+  const s=new Date(d.getFullYear(),0,1);
+  const w=Math.ceil(((d-s)/86400000+s.getDay()+1)/7);
+  return d.getFullYear()+'-W'+String(w).padStart(2,'0');
+}
+
+function getWeeksInMonth(ym){
+  const [y,m]=ym.split('-').map(Number);
+  const weeks=new Set();
+  const d=new Date(y,m-1,1);
+  const end=new Date(y,m,0);
+  while(d<=end){weeks.add(getWeekKeyFromDate(d));d.setDate(d.getDate()+1);}
+  return [...weeks];
+}
+
+function quizHistoryNav(dir){
+  const next=shiftYM(quizHistoryMonth,dir==='prev'?-1:1);
+  if(dir==='next'&&next>getYM())return;
+  quizHistoryMonth=next;
+  loadQuizAdminList();
+}
+
+function quizQuestionCard(q,wk,deletable=true){
+  const sw=q.scheduled_week||q.week_key||'';
+  const isNow=sw===wk;
+  const isPast=sw&&sw<wk;
+  const isFuture=sw&&sw>wk;
+  const weekLabel=isNow?'📍 이번 주':isPast?'✅ 진행됨':isFuture?'⏳ 예약됨':'';
+  const borderColor=isNow?'var(--purple)':isFuture?'rgba(0,195,255,0.4)':'var(--border)';
+  const typeLabel=q.quiz_type==='multiple'
+    ?'<span style="font-size:10px;background:rgba(162,123,255,0.2);color:var(--purple);border:1px solid var(--purple);padding:1px 6px;border-radius:8px;margin-left:4px;">객관식</span>'
+    :'<span style="font-size:10px;background:rgba(0,195,255,0.1);color:var(--sky);border:1px solid rgba(0,195,255,0.3);padding:1px 6px;border-radius:8px;margin-left:4px;">주관식</span>';
+  const optionsHtml=q.quiz_type==='multiple'?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;">${['A','B','C','D'].map(l=>{const v=q['option_'+l.toLowerCase()];const isAns=v&&v.replace(/\s/g,'').toLowerCase()===q.answer.replace(/\s/g,'').toLowerCase();return v?`<div style="font-size:11px;padding:4px 8px;border-radius:6px;background:${isAns?'rgba(29,158,117,0.2)':'rgba(255,255,255,0.05)'};border:1px solid ${isAns?'var(--green)':'var(--border)'};">${l}. ${v}${isAns?' ✅':''}</div>`:''}).join('')}</div>`:'';
+  return `<div style="background:var(--card);border-radius:12px;border:1.5px solid ${borderColor};padding:1rem;margin-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+        <span style="font-size:11px;font-weight:700;color:${isNow?'var(--purple)':isFuture?'var(--sky)':'var(--text-hint)'};">${weekLabel}${weekLabel?' · ':''}${sw}</span>
+        ${typeLabel}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:11px;color:var(--text-hint);">✍️ ${q.created_by||'-'}</span>
+        ${deletable?`<button onclick="SB.del('quiz_relay','${q.id}').then(()=>{showToast('🗑️ 삭제됨');loadQuizAdminList();})" style="padding:3px 8px;background:#888;color:#fff;border:none;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">🗑️</button>`:''}
+      </div>
+    </div>
+    <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">${q.question}</div>
+    <div style="font-size:12px;color:var(--green);">정답: ${q.answer}</div>
+    ${optionsHtml}
+    ${q.hint?`<div style="font-size:11px;color:var(--text-hint);margin-top:4px;">힌트: ${q.hint}</div>`:''}
+  </div>`;
+}
+
 async function loadQuizAdminList(){
-  const rows=await SB.get('quiz_relay','order=scheduled_week.desc,created_at.desc&limit=30');
+  const ym=quizHistoryMonth;
+  const isCurrent=ym===getYM();
+  document.getElementById('quiz-history-month-label').textContent=ym+' 퀴즈 내역';
+  const nextBtn=document.getElementById('quiz-history-next-btn');
+  if(nextBtn)nextBtn.style.opacity=isCurrent?'0.3':'1';
+
+  const monthWeeks=getWeeksInMonth(ym);
+  const allRows=await SB.get('quiz_relay','order=scheduled_week.asc,created_at.asc&limit=500');
+  const rows=allRows.filter(q=>monthWeeks.includes(q.scheduled_week||q.week_key||''));
+
   const el=document.getElementById('quiz-admin-list');
   const wk=getWeekKey();
-  if(!rows.length){el.innerHTML='<div class="rank-empty" style="background:var(--card);border-radius:12px;">등록된 문제 없음</div>';return;}
-  el.innerHTML=rows.map(q=>{
-    const sw=q.scheduled_week||q.week_key||'';
-    const isNow=sw===wk;
-    const isPast=sw&&sw<wk;
-    const isFuture=sw&&sw>wk;
-    const weekLabel=isNow?'📍 이번 주':isPast?'✅ 지난 주':isFuture?'⏳ 예약됨':'';
-    const borderColor=isNow?'var(--purple)':isFuture?'rgba(0,195,255,0.4)':'var(--border)';
-    const typeLabel=q.quiz_type==='multiple'?'<span style="font-size:10px;background:rgba(162,123,255,0.2);color:var(--purple);border:1px solid var(--purple);padding:1px 6px;border-radius:8px;margin-left:4px;">객관식</span>':'<span style="font-size:10px;background:rgba(0,195,255,0.1);color:var(--sky);border:1px solid rgba(0,195,255,0.3);padding:1px 6px;border-radius:8px;margin-left:4px;">주관식</span>';
-    const optionsHtml=q.quiz_type==='multiple'?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;">${['A','B','C','D'].map(l=>{const v=q['option_'+l.toLowerCase()];const isAns=v&&v.replace(/\s/g,'').toLowerCase()===q.answer.replace(/\s/g,'').toLowerCase();return v?`<div style="font-size:11px;padding:4px 8px;border-radius:6px;background:${isAns?'rgba(29,158,117,0.2)':'rgba(255,255,255,0.05)'};border:1px solid ${isAns?'var(--green)':'var(--border)'};">${l}. ${v}${isAns?' ✅':''}</div>`:''}).join('')}</div>`:'';
-    return `<div style="background:var(--card);border-radius:12px;border:1.5px solid ${borderColor};padding:1rem;margin-bottom:8px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="display:flex;align-items:center;gap:4px;">
-          <span style="font-size:11px;font-weight:700;color:${isNow?'var(--purple)':isFuture?'var(--sky)':'var(--text-hint)'};">${weekLabel} · ${sw}</span>
-          ${typeLabel}
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:11px;color:var(--text-hint);">✍️ ${q.created_by}</span>
-          <button onclick="SB.del('quiz_relay','${q.id}').then(()=>{showToast('🗑️ 삭제됨');loadQuizAdminList();})" style="padding:3px 8px;background:#888;color:#fff;border:none;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">🗑️</button>
-        </div>
-      </div>
-      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;">${q.question}</div>
-      <div style="font-size:12px;color:var(--green);">정답: ${q.answer}</div>
-      ${optionsHtml}
-      ${q.hint?`<div style="font-size:11px;color:var(--text-hint);margin-top:4px;">힌트: ${q.hint}</div>`:''}
-    </div>`;
-  }).join('');
+  const summary=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0.75rem;">
+    <span style="font-size:12px;color:var(--text-hint);">총 ${rows.length}문제</span>
+    <span style="font-size:12px;color:var(--purple);">✏️ 주관식 ${rows.filter(q=>q.quiz_type!=='multiple').length}</span>
+    <span style="font-size:12px;color:var(--sky);">🔘 객관식 ${rows.filter(q=>q.quiz_type==='multiple').length}</span>
+  </div>`;
+  if(!rows.length){
+    el.innerHTML=summary+'<div class="rank-empty" style="background:var(--card);border-radius:12px;">해당 월 등록된 문제 없음</div>';
+    return;
+  }
+  el.innerHTML=summary+rows.map(q=>quizQuestionCard(q,wk,isCurrent)).join('');
 }
 
 // ── QUIZ ELIM MANAGE ──
@@ -1489,7 +1563,7 @@ async function loadRacePage(){
 
   // 배너 태그 업데이트
   const autoTag=document.getElementById('race-auto-day-tag');
-  if(autoTag)autoTag.textContent='매월 '+autoDay+'일 자동운영';
+  if(autoTag)autoTag.textContent=formatKorDateTime(effectiveDate,getRaceAutoHour());
 
   // 경품 목록
   const rewards=await SB.get('rewards','year_month=eq.'+ym+'&order=votes.desc');
@@ -1514,18 +1588,15 @@ async function loadRacePage(){
   const entry=await SB.get('race_entries','year_month=eq.'+ym+'&name=eq.'+encodeURIComponent(app.name));
   if(entry.length>0){document.getElementById('race-join-section').style.display='none';document.getElementById('race-joined-badge').style.display='block';}
   else{document.getElementById('race-joined-badge').style.display='none';}
-  // joined badge 문구: 모드에 따라 다르게
+  // joined badge 자동운영일 항상 표시
   const subEl=document.getElementById('race-joined-sub');
-  if(subEl){
-    if(mode==='auto') subEl.textContent=formatKorDateTime(effectiveDate,getRaceAutoHour())+' 자동 운영 예정';
-    else subEl.textContent='관리자가 수동으로 레이스를 시작합니다';
-  }
+  if(subEl)subEl.textContent=formatKorDateTime(effectiveDate,getRaceAutoHour())+' 자동 운영 예정';
 
-  // 결과 확인
-  const result=await SB.get('race_results','year_month=eq.'+ym+'&order=created_at.desc&limit=1');
+  // 결과 확인 (이번 달 전체)
+  const results=await SB.get('race_results','year_month=eq.'+ym+'&order=created_at.asc');
 
   // ── 자동 운영 체크 (자동모드 + 오늘이 effective date + 설정 시간 이후 + 결과 없음) ──
-  if(!result.length && mode==='auto'){
+  if(!results.length && mode==='auto'){
     const today=new Date();
     const autoHour=getRaceAutoHour();
     if(today.toDateString()===effectiveDate.toDateString() && today.getHours()>=autoHour){
@@ -1544,18 +1615,16 @@ async function loadRacePage(){
     document.getElementById('race-admin-start-section').style.display='block';
     document.getElementById('race-vote-section').style.display='none';
 
-    if(result.length>0){
+    if(results.length>0){
       // 이미 완료 → 시작 버튼 숨기고 완료 표시
       document.getElementById('race-admin-auto-badge').style.display='none';
       document.getElementById('race-admin-manual-ctrl').style.display='none';
     } else if(mode==='auto'){
-      // 자동운영 모드 안내
       document.getElementById('race-admin-auto-badge').style.display='block';
       document.getElementById('race-admin-manual-ctrl').style.display='none';
       const descEl=document.getElementById('race-admin-auto-desc');
       if(descEl)descEl.textContent=formatKorDateTime(effectiveDate,getRaceAutoHour())+'에 자동으로 레이스가 진행됩니다. 수동으로 진행하려면 아래 버튼을 누르세요.';
     } else {
-      // 수동운영 모드
       document.getElementById('race-admin-auto-badge').style.display='none';
       document.getElementById('race-admin-manual-ctrl').style.display='block';
     }
@@ -1565,22 +1634,25 @@ async function loadRacePage(){
   }
 
   // 결과 표시
-  if(result.length>0){
-    window._raceResult=result[0];
-    document.getElementById('race-winner-name').textContent=result[0].winner_name;
+  if(results.length>0){
+    window._raceResult=results[results.length-1]; // 최신 결과로 애니메이션
+    renderWinnerDisplay(results);
     if(!app.isAdmin){
       document.getElementById('race-result-section').style.display='block';
       document.getElementById('race-result-teaser').style.display='block';
       document.getElementById('race-result-box').style.display='none';
       document.getElementById('user-race-canvas').style.display='none';
       document.getElementById('user-race-status').textContent='';
+      document.getElementById('race-admin-result-actions').style.display='none';
     } else {
       document.getElementById('race-result-section').style.display='block';
       document.getElementById('race-result-teaser').style.display='none';
       document.getElementById('race-result-box').style.display='block';
+      document.getElementById('race-admin-result-actions').style.display='flex';
     }
   } else {
     document.getElementById('race-result-section').style.display='none';
+    document.getElementById('race-admin-result-actions').style.display='none';
     window._raceResult=null;
   }
 }
@@ -1639,7 +1711,7 @@ function switchAdminTab(btn,tab){
   if(tab==='pending')loadAdminPending();
   if(tab==='funny-all'){adminFunnyMonth=getYM();loadAdminFunnyAll();}
   if(tab==='idea-all'){adminIdeaMonth=getYM();loadAdminIdeaAll();}
-  if(tab==='quiz-mgmt'){populateWeekSelect();loadQuizAdminList();renderPrizeTiers();loadElimList();loadQuizTimeDisplay();}
+  if(tab==='quiz-mgmt'){populateWeekSelect();quizHistoryMonth=getYM();loadQuizAdminList();renderPrizeTiers();loadElimList();loadQuizTimeDisplay();}
   if(tab==='race-mgmt'){loadAdminRewardList();loadRaceAutoDaySetting();SB.get('race_entries','year_month=eq.'+getYM()).then(r=>document.getElementById('race-entry-count-admin').textContent=r.length);}
   if(tab==='emp-mgmt')loadEmployeeList();
 }
@@ -2175,11 +2247,17 @@ function loadRaceAutoDaySetting(){
   if(hourInp)hourInp.value=getRaceAutoHour();
   updateRaceModeUI(getMonthRaceMode(ym));
   updateEffectiveDatePreview();
-  SB.get('race_results','year_month=eq.'+ym+'&limit=1').then(r=>{
+  SB.get('race_results','year_month=eq.'+ym+'&order=created_at.asc').then(r=>{
     const doneEl=document.getElementById('race-admin-done-notice');
     if(doneEl){
       doneEl.style.display=r.length?'block':'none';
-      if(r.length){const wEl=document.getElementById('race-admin-done-winner');if(wEl)wEl.textContent='🏆 당첨자: '+r[0].winner_name;}
+      if(r.length){
+        const listEl=document.getElementById('race-admin-done-list');
+        if(listEl)listEl.innerHTML=r.map((w,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,220,120,0.1);">
+          <span style="font-size:11px;font-weight:700;color:rgba(0,220,120,0.6);min-width:28px;">${i+1}차</span>
+          <span style="font-size:13px;font-weight:700;color:#00ff88;">🏆 ${w.winner_name}</span>
+        </div>`).join('');
+      }
     }
     SB.get('race_entries','year_month=eq.'+ym).then(e=>{
       const ec=document.getElementById('race-entry-count-admin');
@@ -2194,8 +2272,54 @@ async function autoRunRace(names,ym){
   const winnerIdx=Math.floor(rng()*names.length);
   const winnerName=names[winnerIdx];
   const ok=await SB.post('race_results',{year_month:ym,winner_name:winnerName,race_seed:seed,race_names:JSON.stringify(names)});
+  if(ok){showToast('🛸 자동 레이스 완료! 🏆 당첨자: '+winnerName);loadRacePage();}
+}
+
+// 당첨자 목록 렌더링 (단독 or 복수)
+function renderWinnerDisplay(results){
+  const el=document.getElementById('race-winner-display');
+  if(!el)return;
+  if(results.length===1){
+    el.innerHTML=`<div style="font-size:26px;font-weight:900;color:#FFD700;text-shadow:0 0 16px rgba(255,200,0,0.7);">${results[0].winner_name}</div>
+      <div style="font-size:12px;color:rgba(255,220,100,0.6);margin-top:6px;letter-spacing:1px;">궤도 레이스 최후 생존자</div>`;
+  } else {
+    el.innerHTML=`<div style="font-size:12px;color:rgba(255,200,0,0.7);margin-bottom:10px;font-weight:700;">이번 달 당첨자 ${results.length}명</div>`+
+      results.map((r,i)=>`<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 0;">
+        <span style="font-size:11px;color:rgba(255,200,0,0.5);font-weight:700;">${i+1}차</span>
+        <span style="font-size:${i===results.length-1?'20':'16'}px;font-weight:900;color:#FFD700;text-shadow:0 0 12px rgba(255,200,0,0.6);">🏆 ${r.winner_name}</span>
+      </div>`).join('');
+  }
+}
+
+// 이번 달 레이스 리셋
+async function resetRaceMonth(){
+  const ym=getYM();
+  const existing=await SB.get('race_results','year_month=eq.'+ym+'&order=created_at.asc');
+  if(!existing.length){showToast('리셋할 결과가 없습니다');return;}
+  const n=existing.length;
+  if(!confirm('이번 달 레이스 결과 '+n+'건을 모두 초기화하시겠습니까?\n(참여자 목록은 유지됩니다)'))return;
+  await SB.delWhere('race_results','year_month=eq.'+ym);
+  showToast('🔄 이번 달 레이스가 초기화되었습니다');
+  loadRaceAutoDaySetting();
+  loadRacePage();
+}
+
+// 추가 추첨
+async function addExtraRace(){
+  const ym=getYM();
+  const existing=await SB.get('race_results','year_month=eq.'+ym+'&order=created_at.asc');
+  const entries=await SB.get('race_entries','year_month=eq.'+ym+'&order=created_at.asc');
+  if(!entries.length){showToast('❌ 참여자가 없습니다');return;}
+  const names=entries.map(e=>e.name);
+  const round=existing.length+1;
+  const seed=parseInt(ym.replace('-',''))+round*997;
+  const rng=makeRaceRNG(seed);
+  const winnerIdx=Math.floor(rng()*names.length);
+  const winnerName=names[winnerIdx];
+  const ok=await SB.post('race_results',{year_month:ym,winner_name:winnerName,race_seed:seed,race_names:JSON.stringify(names)});
   if(ok){
-    showToast('🛸 자동 레이스 완료! 🏆 당첨자: '+winnerName);
+    showToast('✅ '+round+'차 추가 추첨 완료! 🏆 '+winnerName);
+    loadRaceAutoDaySetting();
     loadRacePage();
   }
 }
