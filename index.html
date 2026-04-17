@@ -70,7 +70,7 @@
 
     /* TOPBAR */
     .topbar{background:rgba(10,20,50,0.8);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,200,255,0.15);padding:0 1.25rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-    .topbar img{height:28px;width:auto;filter:drop-shadow(0 0 6px rgba(0,200,255,0.4));}
+    .topbar img{height:40px;width:auto;filter:drop-shadow(0 0 6px rgba(0,200,255,0.4));}
     .topbar-right{display:flex;align-items:center;gap:10px;}
     .topbar-name{font-size:13px;color:rgba(255,255,255,0.7);}
     .topbar-name strong{color:#fff;}
@@ -322,8 +322,8 @@
 <!-- MAIN -->
 <div class="screen" id="screen-main">
   <div class="topbar">
-    <div style="height: 38px; overflow: hidden; display: flex; align-items: flex-start;">
-      <img src="logo_premium_transparent.png" alt="CONTEC+" style="height: 68px; width: auto; margin-top: -3px; filter: brightness(1.2);"/>
+    <div onclick="switchPage('home')" style="cursor:pointer; height:52px; overflow:hidden; display:flex; align-items:center;">
+      <img src="logo_premium_transparent.png" alt="CONTEC+" style="height:110px; width:auto; filter:brightness(1.2);"/>
     </div>
     <div class="topbar-right">
       <div class="topbar-name"><strong id="disp-name"></strong>님</div>
