@@ -317,7 +317,10 @@
       <input type="checkbox" id="chk-remember" style="width:15px;height:15px;accent-color:#00c3ff;cursor:pointer;flex-shrink:0;"/>
       <label for="chk-remember" style="font-size:12px;color:rgba(255,255,255,0.5);cursor:pointer;user-select:none;">로그인 정보 저장</label>
     </div>
-    <div style="text-align:center;margin-top:10px;">
+    <div style="text-align:center;margin-top:8px;">
+      <button onclick="openForgotPw()" style="background:none;border:none;font-family:inherit;font-size:12px;color:rgba(0,200,255,0.6);cursor:pointer;text-decoration:underline;text-underline-offset:3px;">비밀번호를 잊으셨나요?</button>
+    </div>
+    <div style="text-align:center;margin-top:4px;">
       <button onclick="openInstallGuide()" style="background:none;border:none;font-family:inherit;font-size:12px;color:rgba(0,200,255,0.7);cursor:pointer;text-decoration:underline;text-underline-offset:3px;">📲 앱 설치 방법 안내</button>
     </div>
   </div>
@@ -952,6 +955,19 @@
     </div>
 
     <button class="btn-install-close" onclick="closeInstallGuide()">확인했어요 ✓</button>
+  </div>
+</div>
+
+<!-- 비밀번호 찾기 모달 -->
+<div class="pw-modal-overlay" id="forgot-pw-overlay" onclick="closeForgotPw(event)">
+  <div class="pw-modal">
+    <div class="pw-modal-title">🔑 비밀번호 찾기<button class="pw-modal-close" onclick="closeForgotPw()">✕</button></div>
+    <div class="m-field">
+      <label>사번</label>
+      <input type="text" id="forgot-empno" placeholder="사번 입력" style="width:100%;padding:12px 14px;font-size:15px;font-family:inherit;border:1px solid rgba(255,255,255,0.2);border-radius:10px;background:rgba(255,255,255,0.1);color:#fff;outline:none;"/>
+    </div>
+    <div id="forgot-result" style="display:none;margin-bottom:1rem;padding:14px;border-radius:12px;background:rgba(0,50,100,0.4);border:1px solid rgba(0,200,255,0.25);font-size:13px;line-height:1.6;color:#cde;"></div>
+    <button class="btn-main" style="background:var(--blue);width:100%;" onclick="lookupForgotPw()">확인</button>
   </div>
 </div>
 
@@ -2645,6 +2661,49 @@ async function changePassword(){
   } else {showToast('❌ 변경 실패');}
 }
 
+// ── 비밀번호 찾기 ──
+function openForgotPw(){
+  document.getElementById('forgot-empno').value='';
+  document.getElementById('forgot-result').style.display='none';
+  document.getElementById('forgot-pw-overlay').classList.add('open');
+}
+function closeForgotPw(e){
+  if(e&&e.target!==document.getElementById('forgot-pw-overlay'))return;
+  document.getElementById('forgot-pw-overlay').classList.remove('open');
+}
+async function lookupForgotPw(){
+  const empno=document.getElementById('forgot-empno').value.trim();
+  const resultEl=document.getElementById('forgot-result');
+  if(!empno){showToast('❌ 사번을 입력해주세요');return;}
+  const rows=await SB.get('employees','emp_no=eq.'+encodeURIComponent(empno)+'&is_active=eq.true');
+  if(!rows.length){
+    resultEl.style.display='block';
+    resultEl.style.borderColor='rgba(226,75,74,0.4)';
+    resultEl.style.background='rgba(226,75,74,0.1)';
+    resultEl.style.color='#ffaaaa';
+    resultEl.innerHTML='등록되지 않은 사번입니다.';
+    return;
+  }
+  const emp=rows[0];
+  const hasPw=!!emp.password;
+  resultEl.style.display='block';
+  resultEl.style.borderColor='rgba(0,200,255,0.25)';
+  resultEl.style.background='rgba(0,50,100,0.4)';
+  resultEl.style.color='#cde';
+  resultEl.innerHTML=`<strong style="color:#fff;">${emp.name}</strong> 님의 계정이 확인되었습니다.<br><br>`
+    +(hasPw
+      ? `비밀번호를 직접 변경하신 경우, 설정한 비밀번호를 사용하세요.<br>기억나지 않으시면 <strong style="color:#00eeff;">관리자에게 초기화를 요청</strong>해주세요.<br><span style="font-size:11px;color:rgba(255,255,255,0.5);">초기화 후 임시 비밀번호는 사번과 동일합니다.</span>`
+      : `아직 비밀번호를 변경하지 않으셨습니다.<br>초기 비밀번호는 <strong style="color:#00eeff;">사번(${emp.emp_no})과 동일</strong>합니다.`);
+}
+
+// ── 관리자 - 직원 암호 초기화 ──
+async function resetEmpPassword(id, empNo, name){
+  if(!confirm(`${name}(${empNo}) 님의 비밀번호를 초기화하시겠습니까?\n초기화 후 임시 비밀번호는 사번과 동일합니다.`))return;
+  const ok=await SB.patch('employees',id,{password:null});
+  if(ok)showToast(`✅ ${name} 님의 비밀번호가 초기화되었습니다`);
+  else showToast('❌ 초기화 실패');
+}
+
 // ── 직원 관리 ──
 async function addEmployee(){
   const empno=document.getElementById('new-empno').value.trim();
@@ -2698,6 +2757,7 @@ function renderEmpList(rows){
       </div>
       <div style="display:flex;gap:6px;">
         <button onclick="toggleEmployee('${r.id}',${r.is_active})" style="padding:4px 10px;background:${r.is_active?'#e65100':'var(--green)'};color:#fff;border:none;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">${r.is_active?'비활성화':'활성화'}</button>
+        <button onclick="resetEmpPassword('${r.id}','${r.emp_no}','${r.name}')" style="padding:4px 10px;background:rgba(0,150,255,0.3);color:#7df;border:1px solid rgba(0,150,255,0.4);border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">🔑 초기화</button>
         <button onclick="SB.del('employees','${r.id}').then(()=>{showToast('🗑️ 삭제됨');loadEmployeeList();})" style="padding:4px 10px;background:#888;color:#fff;border:none;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;">🗑️</button>
       </div>
     </div>`).join(''):'<div class="rank-empty" style="background:var(--card);border-radius:12px;">검색 결과 없음</div>';
@@ -2969,22 +3029,29 @@ function previewImg(input,previewId,btnId){
 if('serviceWorker' in navigator){
   let _swReg=null;
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').then(reg=>{
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
       _swReg=reg;
 
-      // 새 SW 설치 감지 → 설치 완료 시 자동 reload
+      function activateWaiting(sw){
+        showToast('🔄 새 버전이 있습니다. 업데이트 중...');
+        sw.postMessage('SKIP_WAITING');
+      }
+
+      // 이미 대기 중인 SW가 있으면 즉시 활성화
+      if(reg.waiting)activateWaiting(reg.waiting);
+
+      // 새 SW 설치 감지
       reg.addEventListener('updatefound',()=>{
         const nw=reg.installing;
         nw.addEventListener('statechange',()=>{
           if(nw.state==='installed'&&navigator.serviceWorker.controller){
-            showToast('🔄 앱 업데이트 중... 잠시 후 새로고침됩니다');
-            setTimeout(()=>window.location.reload(),2000);
+            activateWaiting(nw);
           }
         });
       });
 
-      // 30분마다 업데이트 확인
-      setInterval(()=>reg.update(),30*60*1000);
+      // 5분마다 업데이트 확인
+      setInterval(()=>reg.update(),5*60*1000);
 
       // 탭이 다시 활성화될 때마다 업데이트 확인
       document.addEventListener('visibilitychange',()=>{

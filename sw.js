@@ -1,4 +1,4 @@
-const CACHE = 'contec-challenge-v40';
+const CACHE = 'contec-challenge-v41';
 const ASSETS = [
   '/CONTEC-Plus/',
   '/CONTEC-Plus/index.html',
