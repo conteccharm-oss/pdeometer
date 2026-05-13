@@ -537,10 +537,10 @@
       <canvas id="race-canvas" style="display:none;margin-top:1rem;border-radius:16px;"></canvas>
       <div id="race-status" style="text-align:center;margin-top:8px;font-size:13px;color:var(--text-hint);"></div>
       <div id="race-winner-announce" style="display:none;background:var(--card);border-radius:16px;border:2px solid var(--gold);padding:1.5rem;text-align:center;margin-top:1rem;">
-        <div style="font-size:36px;margin-bottom:8px;">🏆</div>
+        <div style="font-size:36px;margin-bottom:8px;">🥇</div>
         <div style="font-size:24px;font-weight:900;color:#fff;" id="race-admin-winner"></div>
-        <div style="font-size:13px;color:var(--text-sub);margin-top:4px;margin-bottom:1rem;">궤도 레이스 우승!</div>
-        <button class="btn-main" style="background:var(--green);width:auto;padding:10px 24px;" onclick="saveRaceWinner()">결과 저장 & 발표</button>
+        <div style="font-size:13px;color:var(--text-sub);margin-top:4px;margin-bottom:1rem;">1등 당첨! 저장하면 2·3등도 자동 추첨됩니다</div>
+        <button class="btn-main" style="background:var(--green);width:auto;padding:10px 24px;" onclick="saveRaceWinner()">결과 저장 & 발표 (1~3등)</button>
       </div>
     </div>
 
@@ -565,7 +565,6 @@
       </div>
       <!-- 관리자 전용 추가 액션 -->
       <div id="race-admin-result-actions" style="display:none;gap:8px;margin-top:1rem;">
-        <button onclick="addExtraRace()" style="flex:1;padding:10px 0;font-size:13px;font-weight:700;font-family:inherit;border-radius:10px;border:1.5px solid rgba(0,200,255,0.35);cursor:pointer;background:rgba(0,100,200,0.2);color:#00eeff;">➕ 추가 추첨</button>
         <button onclick="resetRaceMonth()" style="flex:1;padding:10px 0;font-size:13px;font-weight:700;font-family:inherit;border-radius:10px;border:1.5px solid rgba(226,75,74,0.4);cursor:pointer;background:rgba(226,75,74,0.1);color:var(--red);">🔄 리셋</button>
       </div>
     </div>
@@ -849,7 +848,6 @@
         </div>
         <div id="race-admin-done-list" style="margin-bottom:12px;"></div>
         <div style="display:flex;gap:8px;">
-          <button onclick="addExtraRace()" style="flex:1;padding:9px 0;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;border:1.5px solid rgba(0,200,255,0.35);cursor:pointer;background:rgba(0,100,200,0.2);color:#00eeff;">➕ 추가 추첨</button>
           <button onclick="resetRaceMonth()" style="flex:1;padding:9px 0;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;border:1.5px solid rgba(226,75,74,0.4);cursor:pointer;background:rgba(226,75,74,0.1);color:var(--red);">🔄 리셋</button>
         </div>
       </div>
@@ -2717,13 +2715,31 @@ function raceDrawWinner(){raceDraw();}
 function showRaceWinner(b){
   document.getElementById('race-admin-winner').textContent=b.name;
   document.getElementById('race-winner-announce').style.display='block';
-  document.getElementById('race-status').textContent='🏆 '+b.name+' 당첨!';
+  document.getElementById('race-status').textContent='🥇 1등 당첨! '+b.name;
 }
 
 async function saveRaceWinner(){
   if(!raceWinner)return;
-  const ok=await SB.post('race_results',{year_month:getYM(),winner_name:raceWinner.name,race_seed:raceSeed,race_names:JSON.stringify(raceSatNames)});
-  if(ok){showToast('🎉 결과 저장 완료! 직원들에게 발표되었습니다');loadRacePage();}
+  const ym=getYM();
+  const entries=await SB.get('race_entries','year_month=eq.'+ym+'&order=created_at.asc');
+  const names=entries.map(e=>e.name);
+  const rank1=raceWinner.name;
+  const winners=[{year_month:ym,winner_name:rank1,race_seed:raceSeed,race_names:JSON.stringify(names),rank:1}];
+  const rem1=names.filter(n=>n!==rank1);
+  if(rem1.length>0){
+    const rng2=makeRaceRNG(raceSeed+997);
+    const win2=rem1[Math.floor(rng2()*rem1.length)];
+    winners.push({year_month:ym,winner_name:win2,race_seed:raceSeed+997,race_names:JSON.stringify(names),rank:2});
+    const rem2=rem1.filter(n=>n!==win2);
+    if(rem2.length>0){
+      const rng3=makeRaceRNG(raceSeed+1994);
+      const win3=rem2[Math.floor(rng3()*rem2.length)];
+      winners.push({year_month:ym,winner_name:win3,race_seed:raceSeed+1994,race_names:JSON.stringify(names),rank:3});
+    }
+  }
+  let allOk=true;
+  for(const w of winners){const ok=await SB.post('race_results',w);if(!ok)allOk=false;}
+  if(allOk){showToast('🎉 결과 저장 완료! 1~'+winners.length+'등 발표되었습니다');loadRacePage();}
 }
 
 // ── 궤도레이스 자동 운영 ──
@@ -2871,10 +2887,12 @@ function loadRaceAutoDaySetting(){
       doneEl.style.display=r.length?'block':'none';
       if(r.length){
         const listEl=document.getElementById('race-admin-done-list');
-        if(listEl)listEl.innerHTML=r.map((w,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,220,120,0.1);">
-          <span style="font-size:11px;font-weight:700;color:rgba(0,220,120,0.6);min-width:28px;">${i+1}차</span>
-          <span style="font-size:13px;font-weight:700;color:#00ff88;">🏆 ${w.winner_name}</span>
-        </div>`).join('');
+        const medals2=['🥇','🥈','🥉'];
+        const sorted2=[...r].sort((a,b)=>(a.rank||1)-(b.rank||1));
+        if(listEl)listEl.innerHTML=sorted2.map((w,i)=>{const medal=medals2[(w.rank||i+1)-1]||'🏅';const label=(w.rank||i+1)+'등';return`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(0,220,120,0.1);">
+          <span style="font-size:11px;font-weight:700;color:rgba(0,220,120,0.6);min-width:36px;">${medal} ${label}</span>
+          <span style="font-size:13px;font-weight:700;color:#00ff88;">${w.winner_name}</span>
+        </div>`;}).join('');
       }
     }
     SB.get('race_entries','year_month=eq.'+ym).then(e=>{
@@ -2886,30 +2904,51 @@ function loadRaceAutoDaySetting(){
 
 async function autoRunRace(names,ym){
   const seed=parseInt(ym.replace('-',''))+7;
-  const rng=makeRaceRNG(seed);
-  const winnerIdx=Math.floor(rng()*names.length);
-  const winnerName=names[winnerIdx];
-  const ok=await SB.post('race_results',{year_month:ym,winner_name:winnerName,race_seed:seed,race_names:JSON.stringify(names)});
-  if(ok){
-    showToast('🛸 자동 레이스 완료! 🏆 당첨자: '+winnerName);
+  const rng1=makeRaceRNG(seed);
+  const win1=names[Math.floor(rng1()*names.length)];
+  const winners=[{year_month:ym,winner_name:win1,race_seed:seed,race_names:JSON.stringify(names),rank:1}];
+  const rem1=names.filter(n=>n!==win1);
+  if(rem1.length>0){
+    const rng2=makeRaceRNG(seed+997);
+    const win2=rem1[Math.floor(rng2()*rem1.length)];
+    winners.push({year_month:ym,winner_name:win2,race_seed:seed+997,race_names:JSON.stringify(names),rank:2});
+    const rem2=rem1.filter(n=>n!==win2);
+    if(rem2.length>0){
+      const rng3=makeRaceRNG(seed+1994);
+      const win3=rem2[Math.floor(rng3()*rem2.length)];
+      winners.push({year_month:ym,winner_name:win3,race_seed:seed+1994,race_names:JSON.stringify(names),rank:3});
+    }
+  }
+  let allOk=true;
+  for(const w of winners){const ok=await SB.post('race_results',w);if(!ok)allOk=false;}
+  if(allOk){
+    showToast('🛸 자동 레이스 완료! 🥇 '+win1+' 외 '+winners.length+'명 당첨!');
     sendRacePushNotification();
     loadRacePage();
   }
 }
 
-// 당첨자 목록 렌더링 (단독 or 복수)
+// 당첨자 목록 렌더링 (1~3등)
 function renderWinnerDisplay(results){
   const el=document.getElementById('race-winner-display');
   if(!el)return;
-  if(results.length===1){
-    el.innerHTML=`<div style="font-size:26px;font-weight:900;color:#FFD700;text-shadow:0 0 16px rgba(255,200,0,0.7);">${results[0].winner_name}</div>
-      <div style="font-size:12px;color:rgba(255,220,100,0.6);margin-top:6px;letter-spacing:1px;">궤도 레이스 최후 생존자</div>`;
+  const medals=['🥇','🥈','🥉'];
+  const rankLabels=['1등','2등','3등'];
+  const sorted=[...results].sort((a,b)=>(a.rank||1)-(b.rank||1));
+  if(sorted.length===1){
+    el.innerHTML=`<div style="font-size:26px;font-weight:900;color:#FFD700;text-shadow:0 0 16px rgba(255,200,0,0.7);">🥇 ${sorted[0].winner_name}</div>
+      <div style="font-size:12px;color:rgba(255,220,100,0.6);margin-top:6px;letter-spacing:1px;">궤도 레이스 1등</div>`;
   } else {
-    el.innerHTML=`<div style="font-size:12px;color:rgba(255,200,0,0.7);margin-bottom:10px;font-weight:700;">이번 달 당첨자 ${results.length}명</div>`+
-      results.map((r,i)=>`<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:6px 0;">
-        <span style="font-size:11px;color:rgba(255,200,0,0.5);font-weight:700;">${i+1}차</span>
-        <span style="font-size:${i===results.length-1?'20':'16'}px;font-weight:900;color:#FFD700;text-shadow:0 0 12px rgba(255,200,0,0.6);">🏆 ${r.winner_name}</span>
-      </div>`).join('');
+    el.innerHTML=`<div style="font-size:12px;color:rgba(255,200,0,0.7);margin-bottom:10px;font-weight:700;">이번 달 당첨자 ${sorted.length}명</div>`+
+      sorted.map((r,i)=>{
+        const rank=(r.rank||i+1)-1;
+        const medal=medals[rank]||'🏅';
+        const label=rankLabels[rank]||(rank+1)+'등';
+        return `<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:7px 0;border-bottom:${i<sorted.length-1?'1px solid rgba(255,200,0,0.15)':'none'};">
+          <span style="font-size:13px;font-weight:700;color:rgba(255,200,0,0.6);min-width:36px;">${medal} ${label}</span>
+          <span style="font-size:${rank===0?'22':'17'}px;font-weight:900;color:#FFD700;text-shadow:0 0 12px rgba(255,200,0,0.6);">${r.winner_name}</span>
+        </div>`;
+      }).join('');
   }
 }
 
