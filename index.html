@@ -476,7 +476,7 @@
       <div style="padding:12px 14px;background:linear-gradient(135deg,#000820,#0a0a2e,#0D1B3E);display:flex;align-items:center;justify-content:space-between;">
         <div>
           <div style="font-size:13px;font-weight:700;color:#fff;text-shadow:0 0 8px rgba(0,200,255,0.6);">🌌 궤도 레이스란?</div>
-          <div style="font-size:11px;color:rgba(180,230,255,0.7);margin-top:2px;">위성들이 궤도를 돌다가 이벤트로 하나씩 탈락! 마지막 생존자 당첨!</div>
+          <div style="font-size:11px;color:rgba(180,230,255,0.7);margin-top:2px;">위성들이 궤도를 돌다가 이벤트로 하나씩 탈락! 최후 생존 3기가 🥇🥈🥉 당첨!</div>
         </div>
         <button onclick="runDemoRace()" id="demo-btn" style="padding:7px 14px;background:rgba(0,200,255,0.12);color:#00eeff;border:1px solid rgba(0,200,255,0.4);border-radius:8px;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;text-shadow:0 0 6px rgba(0,200,255,0.6);">▶ 데모</button>
       </div>
@@ -1081,7 +1081,7 @@
         <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;">🌌 참여하면 <strong style="color:#00eeff;">내 위성</strong>이 궤도에 올라가요</div>
         <div style="background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.2);border-radius:10px;padding:10px 12px;">🎁 원하는 <strong style="color:#00eeff;">경품에 투표</strong>해서 상품을 결정해요</div>
         <div style="background:rgba(180,100,255,0.08);border:1px solid rgba(180,100,255,0.2);border-radius:10px;padding:10px 12px;">💫 추첨일에 위성들이 <strong style="color:#cc88ff;">하나씩 탈락</strong>하며 레이스 진행</div>
-        <div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:10px;padding:10px 12px;">🏆 <strong style="color:#ffd700;">마지막 생존 위성</strong>의 주인이 경품 당첨!</div>
+        <div style="background:rgba(255,200,0,0.08);border:1px solid rgba(255,200,0,0.2);border-radius:10px;padding:10px 12px;">🥇🥈🥉 <strong style="color:#ffd700;">최후 생존 위성 3기</strong>의 주인이 차등 경품 당첨!</div>
       </div>
       <div style="margin-top:12px;background:rgba(0,255,150,0.07);border:1px solid rgba(0,255,150,0.2);border-radius:10px;padding:10px 12px;">
         🔔 <strong style="color:#00ff99;">레이스 시작 알림</strong>을 받고 싶다면?<br/>
@@ -3254,19 +3254,23 @@ function runDemoRace(){
   const W=canvas.offsetWidth||360,H=W;canvas.width=W;canvas.height=H;
   const CX=W/2,CY=H/2,ER=40;
   const n=15,NAMES=['김민준','이서연','박지훈','최수아','정민서','강하은','조현우','윤서진','임도현','한채원','오준혁','신예린','곽태양','문지아','배성민'];
-  const winIdx=Math.floor(Math.random()*n);
+  // 3명 무작위 생존자 선정
+  const dPerm=[...Array(n).keys()].sort(()=>Math.random()-0.5);
+  const dWinSet=new Set(dPerm.slice(0,3));
+  const dRankMap={};dPerm.slice(0,3).forEach((idx,ri)=>{dRankMap[idx]=ri+1;});
   const minR=ER+20,maxR=Math.min(W,H)*0.44;
-  let dT=0,dPhase='countdown',dCd=3,dCdTimer=0,dParticles=[];
+  let dT=0,dPhase='countdown',dCd=3,dCdTimer=0,dParticles=[],dDone=false;
   let dEventQ=[{type:'meteor',at:4},{type:'collision',at:9},{type:'solarWind',at:14},{type:'blackHole',at:20}];
   let dEvents={meteor:null,solarWind:null,blackHole:null,msg:{text:'',alpha:0,timer:0},shake:0};
   const DSC=[[255,255,255],[180,210,255],[255,240,180],[160,200,255],[255,200,200]];
   const dStars=Array.from({length:180},()=>{const c=DSC[Math.floor(Math.random()*DSC.length)];return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+0.3,a:Math.random()*0.9+0.2,tw:Math.random()*Math.PI*2,c,big:Math.random()<0.1};});
   const dSats=Array.from({length:n},(_,i)=>{
+    const isWinner=dWinSet.has(i);
+    const rank=dRankMap[i]||0;
     const orbitR=minR+(maxR-minR)*(i/(n-1))*(0.65+Math.random()*0.35);
     const spd=(0.022+Math.random()*0.016)*(Math.random()>0.5?1:-1);
-    return{name:NAMES[i],color:RC[i%RC.length],orbitR,angle:(Math.PI*2/n)*i,speed:spd,isWinner:i===winIdx,state:'orbit',departDelay:3+Math.random()*8+i*0.4,departTimer:0,x:0,y:0,scale:1,opacity:1,flash:0,explodeT:0,wobble:0};
+    return{name:NAMES[i],color:RC[i%RC.length],orbitR,angle:(Math.PI*2/n)*i,speed:spd,isWinner,rank,state:'orbit',departDelay:isWinner?9999:3+Math.random()*8+i*0.4,departTimer:0,x:0,y:0,scale:1,opacity:1,flash:0,explodeT:0,wobble:0};
   });
-  dSats[winIdx].departDelay=9999;
 
   function dAddP(x,y,c,cnt=10){for(let i=0;i<cnt;i++){const a=Math.random()*Math.PI*2,s=2+Math.random()*3;dParticles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,col:c,life:1,r:2+Math.random()*2});}}
   function dAddW(x,y,c,mr=35){dParticles.push({type:'wave',x,y,r:5,maxR:mr,col:c,life:1});}
@@ -3292,8 +3296,8 @@ function runDemoRace(){
     dSats.forEach(s=>{
       if(s.state==='gone')return;s.flash=Math.max(0,s.flash-0.05);if(s.wobble>0)s.wobble=Math.max(0,s.wobble-0.04);
       if(s.state==='orbit'){s.angle+=s.speed+(s.wobble?(Math.random()-0.5)*0.07:0);s.x=CX+Math.cos(s.angle)*s.orbitR+(s.wobble?(Math.random()-0.5)*s.wobble*12:0);s.y=CY+Math.sin(s.angle)*s.orbitR+(s.wobble?(Math.random()-0.5)*s.wobble*12:0);s.departTimer+=1/60;if(s.departTimer>s.departDelay&&!s.isWinner)dExplode(s);}
-      else if(s.state==='exploding'){s.explodeT+=1/60;s.scale=Math.max(0,1-s.explodeT*3);s.opacity=Math.max(0,1-s.explodeT*2.5);if(s.explodeT>0.5){s.state='gone';const allGone=dSats.filter(ss=>!ss.isWinner).every(ss=>ss.state==='gone');const w=dSats.find(ss=>ss.isWinner&&ss.state==='orbit');if(allGone&&w)setTimeout(()=>{w.state='winner';},150);}}
-      else if(s.state==='winner'){s.angle+=s.speed*0.3;s.orbitR=Math.max(ER+14,s.orbitR-0.5);s.x=CX+Math.cos(s.angle)*s.orbitR;s.y=CY+Math.sin(s.angle)*s.orbitR;s.scale=Math.min(3.5,s.scale+0.022);s.flash=0.5+0.5*Math.sin(dT*8);if(s.scale>=3.5){s.state='done';setTimeout(()=>{demoRunning=false;canvas.style.display='none';btn.textContent='▶ 데모';},1500);}}
+      else if(s.state==='exploding'){s.explodeT+=1/60;s.scale=Math.max(0,1-s.explodeT*3);s.opacity=Math.max(0,1-s.explodeT*2.5);if(s.explodeT>0.5){s.state='gone';const allGone=dSats.filter(ss=>!ss.isWinner).every(ss=>ss.state==='gone');const aliveW=dSats.filter(ss=>ss.isWinner&&ss.state==='orbit');if(allGone&&aliveW.length>0&&!dDone){dDone=true;const sorted=[...aliveW].sort((a,b)=>(a.rank||1)-(b.rank||1));setTimeout(()=>{sorted[0].state='winner';for(let i=1;i<sorted.length;i++)sorted[i].flash=1;},150);}}}
+      else if(s.state==='winner'){s.angle+=s.speed*0.3;s.orbitR=Math.max(ER+14,s.orbitR-0.5);s.x=CX+Math.cos(s.angle)*s.orbitR;s.y=CY+Math.sin(s.angle)*s.orbitR;s.scale=Math.min(3.5,s.scale+0.022);s.flash=0.5+0.5*Math.sin(dT*8);if(s.scale>=3.5){s.state='done';setTimeout(()=>{demoRunning=false;canvas.style.display='none';btn.textContent='▶ 데모';},2000);}}
     });
   }
 
@@ -3304,7 +3308,7 @@ function runDemoRace(){
     const dbgG=ctx.createRadialGradient(W*0.5,H*0.4,0,W*0.5,H*0.5,W*0.75);dbgG.addColorStop(0,'#1a2d5a');dbgG.addColorStop(0.5,'#0D1B3E');dbgG.addColorStop(1,'#000820');ctx.fillStyle=dbgG;ctx.fillRect(0,0,W,H);
     if(dEvents.solarWind?.phase==='blast'){const bt=dEvents.solarWind.blastT||0;const fm=Math.max(0,1-bt*2.5);const am=Math.min(0.4,bt*0.2);ctx.fillStyle=`rgba(255,180,0,${am+fm*0.6})`;ctx.fillRect(0,0,W,H);}
     dStars.forEach(s=>{s.tw+=0.01;const a=Math.min(1,s.a*(0.55+0.45*Math.sin(s.tw)));if(s.big){ctx.shadowColor=`rgb(${s.c})`;ctx.shadowBlur=8;}ctx.fillStyle=`rgba(${s.c[0]},${s.c[1]},${s.c[2]},${a})`;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();if(s.big)ctx.shadowBlur=0;});
-    dSats.filter(s=>s.state==='orbit'||s.state==='winner').forEach(s=>{ctx.shadowColor='rgba(0,210,255,0.5)';ctx.shadowBlur=5;ctx.strokeStyle='rgba(0,210,255,0.2)';ctx.lineWidth=1;ctx.setLineDash([4,8]);ctx.beginPath();ctx.arc(CX,CY,s.orbitR,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;});
+    dSats.filter(s=>s.state==='orbit'||s.state==='winner'||(dDone&&s.isWinner)).forEach(s=>{ctx.shadowColor='rgba(0,210,255,0.5)';ctx.shadowBlur=5;ctx.strokeStyle='rgba(0,210,255,0.2)';ctx.lineWidth=1;ctx.setLineDash([4,8]);ctx.beginPath();ctx.arc(CX,CY,s.orbitR,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;});
     if(dEvents.blackHole){const bh=dEvents.blackHole;for(let i=3;i>=1;i--){ctx.strokeStyle=`rgba(180,100,255,${0.1*i})`;ctx.lineWidth=3*i;ctx.beginPath();ctx.arc(bh.x,bh.y,bh.r+i*8,0,Math.PI*2);ctx.stroke();}const g=ctx.createRadialGradient(bh.x,bh.y,0,bh.x,bh.y,bh.r);g.addColorStop(0,'rgba(0,0,0,1)');g.addColorStop(0.6,'rgba(60,0,100,0.9)');g.addColorStop(1,'rgba(180,0,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(bh.x,bh.y,bh.r+4,0,Math.PI*2);ctx.fill();}
     dParticles.forEach(p=>{if(p.type==='wave'){ctx.strokeStyle=p.col+Math.floor(p.life*160).toString(16).padStart(2,'0');ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.stroke();}else{ctx.globalAlpha=p.life;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}});
     if(dEvents.meteor?.active){const m=dEvents.meteor;for(let i=1;i<m.trail.length;i++){ctx.strokeStyle=`rgba(255,80,0,${i/m.trail.length*0.85})`;ctx.lineWidth=(i/m.trail.length)*16;ctx.beginPath();ctx.moveTo(m.trail[i-1].x,m.trail[i-1].y);ctx.lineTo(m.trail[i].x,m.trail[i].y);ctx.stroke();}ctx.shadowColor='#FF3300';ctx.shadowBlur=25;ctx.fillStyle='#FF2200';ctx.beginPath();ctx.arc(m.x,m.y,m.r,0,Math.PI*2);ctx.fill();ctx.fillStyle='#FFCC00';ctx.beginPath();ctx.arc(m.x-3,m.y-3,m.r*0.4,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;}
@@ -3323,6 +3327,7 @@ function runDemoRace(){
       if(r>=3){ctx.fillStyle='rgba(0,0,0,0.85)';ctx.font=`bold ${Math.min(6,r*0.7)}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.name.slice(0,2),s.x,s.y);ctx.textBaseline='alphabetic';}
       ctx.globalAlpha=1;
       if(s.state==='winner'&&s.scale>2){ctx.fillStyle='#FFD700';ctx.font=`bold ${Math.round(8*s.scale/2)}px sans-serif`;ctx.textAlign='center';ctx.fillText(s.name,s.x,s.y-r-6);}
+      if(dDone&&s.isWinner&&s.rank>1&&(s.state==='orbit'||s.state==='done')){const dm=['🥈','🥉'];ctx.fillStyle='#FFD700';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText((dm[s.rank-2]||'')+' '+s.name,s.x,s.y-r-8);ctx.textBaseline='alphabetic';}
     });
     const em=dEvents.msg;
     if(em.alpha>0){ctx.save();ctx.globalAlpha=em.alpha;const tw=ctx.measureText(em.text).width+24;ctx.fillStyle='rgba(0,0,20,0.88)';ctx.strokeStyle='rgba(0,200,255,0.8)';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(CX-tw/2,CY-H*0.28-12,tw,28,7);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(em.text,CX,CY-H*0.28+2);ctx.restore();}
