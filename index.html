@@ -400,7 +400,8 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div style="font-size:15px;font-weight:700;">🚀 우주 퀴즈 릴레이</div>
         <div style="display:flex;align-items:center;gap:8px;">
-          <div style="font-size:12px;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;">생존자 <span id="quiz-alive">-</span>명</div>
+          <div onclick="showSurvivorPopup()" style="font-size:12px;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;cursor:pointer;">생존자 <span id="quiz-alive">-</span>명 👁</div>
+          <div id="quiz-winner-badge" style="display:none;font-size:12px;background:rgba(255,200,0,0.2);border:1px solid rgba(255,200,0,0.5);border-radius:20px;padding:4px 12px;color:#ffd700;">🏆 <span id="quiz-winner-name"></span></div>
           <button onclick="showInfoPopup('quiz',true)" style="font-size:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 10px;color:rgba(255,255,255,0.7);cursor:pointer;font-family:inherit;">❓ 설명</button>
         </div>
       </div>
@@ -1014,6 +1015,14 @@
   </div>
 </div>
 
+<!-- 생존자 목록 모달 -->
+<div class="pw-modal-overlay" id="survivor-popup-overlay" onclick="closeSurvivorPopup(event)">
+  <div class="pw-modal" style="max-height:80vh;overflow-y:auto;">
+    <div class="pw-modal-title">🟢 현재 생존자 목록<button class="pw-modal-close" onclick="closeSurvivorPopup()">✕</button></div>
+    <div id="survivor-popup-list"></div>
+  </div>
+</div>
+
 <!-- 비밀번호 찾기 모달 -->
 <div class="pw-modal-overlay" id="forgot-pw-overlay" onclick="closeForgotPw(event)">
   <div class="pw-modal">
@@ -1302,8 +1311,16 @@ async function loadQuizPage(){
   const all=await SB.get('quiz_attempts','year_month=eq.'+ym);
   const dead=new Set(all.filter(a=>!a.is_correct).map(a=>a.name));
   const part=new Set(all.map(a=>a.name));
-  const aliveCount=Math.max(0,[...part].filter(n=>!dead.has(n)).length);
+  const aliveNames=[...part].filter(n=>!dead.has(n));
+  const aliveCount=Math.max(0,aliveNames.length);
+  window._quizSurvivors=aliveNames;
   document.getElementById('quiz-alive').textContent=aliveCount;
+  const winBadge=document.getElementById('quiz-winner-badge');
+  const winName=document.getElementById('quiz-winner-name');
+  if(winBadge&&winName){
+    if(aliveCount===1){winName.textContent=aliveNames[0];winBadge.style.display='block';}
+    else{winBadge.style.display='none';}
+  }
   loadQuizPrizeTiers();
   // 현재 경품 표시
   const curPrize=getCurrentPrize(aliveCount);
@@ -1851,7 +1868,8 @@ async function loadFunnyList(){
   const totalVotes=approved.reduce((a,b)=>a+(b.votes||0),0);
   infoEl.textContent=approved.length>0?'· 항목별 투표 가능':'';
   const rankBadge=(idx)=>{
-    if(idx===0&&approved.length>0)return'<span class="funny-rank-badge rank-gold">🥇 1위</span>';
+    if(totalVotes===0)return'';
+    if(idx===0)return'<span class="funny-rank-badge rank-gold">🥇 1위</span>';
     if(idx===1)return'<span class="funny-rank-badge rank-silver">🥈 2위</span>';
     if(idx===2)return'<span class="funny-rank-badge rank-bronze">🥉 3위</span>';
     return'';
@@ -1999,7 +2017,8 @@ async function loadIdeaList(){
   const totalVotes=rows.reduce((a,b)=>a+(b.votes||0),0);
   infoEl.textContent=rows.length>0?'· 항목별 투표 가능':'';
   const rankBadge=(idx)=>{
-    if(idx===0&&rows.length>0)return'<span class="funny-rank-badge rank-gold">🥇 1위</span>';
+    if(totalVotes===0)return'';
+    if(idx===0)return'<span class="funny-rank-badge rank-gold">🥇 1위</span>';
     if(idx===1)return'<span class="funny-rank-badge rank-silver">🥈 2위</span>';
     if(idx===2)return'<span class="funny-rank-badge rank-bronze">🥉 3위</span>';
     return'';
@@ -2009,6 +2028,7 @@ async function loadIdeaList(){
     const voted=myVotedIds.has(r.id);
     return`<div class="funny-card${voted?' my-voted':''}">
       <div class="funny-card-body">
+        ${rankBadge(rank)}
         ${r.status==='winner'?'<span class="status-pill pill-winner" style="font-size:10px;margin-bottom:6px;display:inline-block;">🏆 선정됨</span>':''}
         <div style="display:flex;justify-content:space-between;align-items:flex-start;">
           <div style="flex:1;min-width:0;">
@@ -3020,6 +3040,20 @@ function openForgotPw(){
   document.getElementById('forgot-confirm-pw').value='';
   _forgotEmpId=null;
   document.getElementById('forgot-pw-overlay').classList.add('open');
+}
+function showSurvivorPopup(){
+  const survivors=window._quizSurvivors||[];
+  const el=document.getElementById('survivor-popup-list');
+  if(el){
+    el.innerHTML=survivors.length
+      ?survivors.map(n=>`<div style="display:flex;align-items:center;background:rgba(0,255,136,0.07);border:1px solid rgba(0,255,136,0.2);border-radius:10px;padding:10px 14px;margin-bottom:6px;"><span style="font-size:18px;margin-right:10px;">🟢</span><span style="font-size:14px;font-weight:700;color:#fff;">${n}</span></div>`).join('')
+      :`<div style="text-align:center;color:var(--text-hint);font-size:13px;padding:16px;">아직 생존자가 없습니다</div>`;
+  }
+  document.getElementById('survivor-popup-overlay').classList.add('open');
+}
+function closeSurvivorPopup(e){
+  if(e&&e.target!==document.getElementById('survivor-popup-overlay'))return;
+  document.getElementById('survivor-popup-overlay').classList.remove('open');
 }
 function closeForgotPw(e){
   if(e&&e.target!==document.getElementById('forgot-pw-overlay'))return;
