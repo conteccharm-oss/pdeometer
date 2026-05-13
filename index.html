@@ -1102,7 +1102,7 @@ const CONFIG = {
 const SB = {
   h: {'Content-Type':'application/json','apikey':CONFIG.supabaseKey,'Authorization':'Bearer '+CONFIG.supabaseKey},
   async get(table,q=''){const r=await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table+'?'+q,{headers:this.h});return r.ok?r.json():[];},
-  async post(table,data){const r=await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table,{method:'POST',headers:{...this.h,'Prefer':'return=minimal'},body:JSON.stringify(data)});return r.ok;},
+  async post(table,data){const r=await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table,{method:'POST',headers:{...this.h,'Prefer':'return=minimal'},body:JSON.stringify(data)});if(!r.ok){const e=await r.text().catch(()=>'');console.error('[SB.post fail]',table,r.status,e);}return r.ok;},
   async patch(table,id,data){const r=await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table+'?id=eq.'+id,{method:'PATCH',headers:{...this.h,'Prefer':'return=minimal'},body:JSON.stringify(data)});return r.ok;},
   async del(table,id){const r=await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table+'?id=eq.'+id,{method:'DELETE',headers:this.h});return r.ok;},
   async delWhere(table,filter){const r=await fetch(CONFIG.supabaseUrl+'/rest/v1/'+table+'?'+filter,{method:'DELETE',headers:this.h});return r.ok;},
@@ -1897,7 +1897,7 @@ async function voteFunny(submissionId){
   const existing=await SB.get('funny_votes','year_month=eq.'+ym+'&voter_name=eq.'+encodeURIComponent(app.name)+'&submission_id=eq.'+submissionId);
   if(existing.length>0){showToast('❌ 이미 투표하셨습니다');return;}
   const ok=await SB.post('funny_votes',{year_month:ym,submission_id:submissionId,voter_name:app.name});
-  if(!ok){showToast('❌ 투표 실패');return;}
+  if(!ok){showToast('❌ 투표 실패 (F12 콘솔 확인)');return;}
   const sub=await SB.get('funny_submissions','id=eq.'+submissionId);
   if(sub[0])await SB.patch('funny_submissions',submissionId,{votes:(sub[0].votes||0)+1});
   showToast('❤️ 투표 완료!');
@@ -2040,7 +2040,7 @@ async function voteIdea(submissionId){
   const existing=await SB.get('idea_votes','year_month=eq.'+ym+'&voter_name=eq.'+encodeURIComponent(app.name)+'&submission_id=eq.'+submissionId);
   if(existing.length>0){showToast('❌ 이미 투표하셨습니다');return;}
   const ok=await SB.post('idea_votes',{year_month:ym,submission_id:submissionId,voter_name:app.name});
-  if(!ok){showToast('❌ 투표 실패');return;}
+  if(!ok){showToast('❌ 투표 실패 (F12 콘솔 확인)');return;}
   const sub=await SB.get('idea_submissions','id=eq.'+submissionId);
   if(sub[0])await SB.patch('idea_submissions',submissionId,{votes:(sub[0].votes||0)+1});
   showToast('💡 투표 완료!');
