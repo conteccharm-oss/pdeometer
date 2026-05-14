@@ -544,7 +544,16 @@
           <button onclick="runAutoRaceNow()" style="flex:1;padding:9px 0;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;border:1.5px solid rgba(0,220,120,0.5);background:rgba(0,180,100,0.15);color:#00ff88;cursor:pointer;">🚀 지금 바로 실행</button>
         </div>
       </div>
-      <canvas id="race-canvas" style="display:none;margin-top:1rem;border-radius:16px;"></canvas>
+      <!-- 캔버스 래퍼 — race-winner-announce가 캔버스 위에 overlay로 표시됨 -->
+      <div id="race-canvas-wrap" style="display:none;position:relative;margin-top:1rem;">
+        <canvas id="race-canvas" style="width:100%;border-radius:16px;display:block;"></canvas>
+        <div id="race-winner-announce" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(4,3,20,0.97);border-radius:16px;border:2px solid rgba(255,200,0,0.55);box-sizing:border-box;overflow-y:auto;z-index:5;padding:1.25rem 1rem;text-align:center;">
+          <div style="font-size:36px;margin-bottom:8px;">🥇</div>
+          <div style="font-size:24px;font-weight:900;color:#fff;" id="race-admin-winner"></div>
+          <div style="font-size:13px;color:var(--text-sub);margin-top:4px;margin-bottom:1rem;">1등 당첨! 저장하면 2·3등도 자동 추첨됩니다</div>
+          <button class="btn-main" style="background:var(--green);width:auto;padding:10px 24px;" onclick="saveRaceWinner()">결과 저장 & 발표 (1~3등)</button>
+        </div>
+      </div>
       <!-- 내 위성 상태 표시 -->
       <div id="my-sat-status" style="display:none;margin-top:8px;border-radius:10px;padding:10px 16px;text-align:center;font-size:13px;font-weight:700;transition:all 0.4s;"></div>
       <!-- 배속 조절 -->
@@ -555,12 +564,6 @@
         <button id="spd-btn-2" onclick="setUserSpeedBoost(2.0)" style="padding:5px 13px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(180,200,255,0.7);cursor:pointer;">×2</button>
       </div>
       <div id="race-status" style="text-align:center;margin-top:8px;font-size:13px;color:var(--text-hint);"></div>
-      <div id="race-winner-announce" style="display:none;background:var(--card);border-radius:16px;border:2px solid var(--gold);padding:1.5rem;text-align:center;margin-top:1rem;">
-        <div style="font-size:36px;margin-bottom:8px;">🥇</div>
-        <div style="font-size:24px;font-weight:900;color:#fff;" id="race-admin-winner"></div>
-        <div style="font-size:13px;color:var(--text-sub);margin-top:4px;margin-bottom:1rem;">1등 당첨! 저장하면 2·3등도 자동 추첨됩니다</div>
-        <button class="btn-main" style="background:var(--green);width:auto;padding:10px 24px;" onclick="saveRaceWinner()">결과 저장 & 발표 (1~3등)</button>
-      </div>
     </div>
 
     <!-- 레이스 결과 -->
@@ -2574,7 +2577,7 @@ async function startOrbitalRace(){
   const _badge=document.getElementById('race-admin-auto-badge');if(_badge)_badge.style.display='none';
   const names=entries.map(e=>e.name);
   const canvas=document.getElementById('race-canvas');
-  canvas.style.display='block';
+  document.getElementById('race-canvas-wrap').style.display='block';
   document.getElementById('race-winner-announce').style.display='none';
   document.getElementById('race-status').textContent='';
   raceW=canvas.offsetWidth||360; raceH=raceW;
@@ -3362,7 +3365,10 @@ function showRaceWinner(winners){
       <button class="btn-main" style="background:var(--green);width:auto;padding:10px 24px;" onclick="saveRaceWinner()">💾 결과 저장 & 발표 (1~${sorted.length}등)</button>
       <button class="btn-main" style="background:linear-gradient(135deg,#1a0a00,#2a1500);border:1.5px solid rgba(255,200,0,0.5);color:#FFD700;width:auto;padding:10px 24px;" onclick="showRaceResultOnly()">🏆 결과만 보기</button>
     </div>`;
-  announceEl.style.display='block';
+  announceEl.style.display='flex';
+  announceEl.style.flexDirection='column';
+  announceEl.style.alignItems='center';
+  announceEl.style.justifyContent='center';
 
   // 자동운영: 버튼 없이 결과 자동 저장
   if(window._autoSaveResult){
@@ -3666,10 +3672,8 @@ async function runAutoRaceNow(){
   const ym=getYM();
   const entries=await SB.get('race_entries','year_month=eq.'+ym+'&order=created_at.asc');
   if(!entries.length){showToast('❌ 참여자가 없습니다');return;}
-  // 관리자 페이지에서 호출 시 레이스 페이지로 이동 후 실행
+  // 관리자: nav 그대로 유지하고 race 페이지만 전환 (사용자 모드로 전환 안 함)
   if(app.isAdmin){
-    document.getElementById('nav-user').style.display='flex';
-    document.getElementById('nav-admin').style.display='none';
     switchPage('race');
     setTimeout(()=>autoRunRace(entries.map(e=>e.name),ym),400);
   } else {
