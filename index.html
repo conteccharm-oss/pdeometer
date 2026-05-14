@@ -489,9 +489,15 @@
       <div id="reward-list"></div>
       <!-- 참여자 궤도 미리보기 캔버스 -->
       <div id="join-orbit-wrap" style="display:none;margin-top:1rem;margin-bottom:0.5rem;">
-        <div style="font-size:11px;color:rgba(0,200,255,0.6);text-align:center;margin-bottom:6px;letter-spacing:0.5px;font-weight:600;">📡 이달 참여자 현황</div>
+        <div onclick="toggleJoinOrbitList()" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:6px;padding:4px 2px;">
+          <span style="font-size:11px;color:rgba(0,200,255,0.6);letter-spacing:0.5px;font-weight:600;">📡 이달 참여자 현황</span>
+          <span id="join-orbit-toggle-icon" style="font-size:11px;color:rgba(0,200,255,0.5);">명단 보기 ▼</span>
+        </div>
         <canvas id="join-orbit-canvas" style="display:block;width:100%;border-radius:12px;background:#000820;border:1px solid rgba(0,200,255,0.15);"></canvas>
-        <div id="join-orbit-count" style="font-size:11px;color:rgba(0,200,255,0.5);text-align:center;margin-top:5px;"></div>
+        <div id="join-orbit-my-label" style="display:none;text-align:center;margin-top:6px;font-size:12px;font-weight:700;color:#00ff88;">🛸 내 위성 궤도 진입 완료!</div>
+        <div id="join-orbit-count" style="font-size:11px;color:rgba(0,200,255,0.5);text-align:center;margin-top:4px;"></div>
+        <!-- 명단 리스트 (토글) -->
+        <div id="join-orbit-list" style="display:none;margin-top:8px;background:rgba(0,8,32,0.8);border:1px solid rgba(0,200,255,0.15);border-radius:10px;padding:10px 12px;max-height:180px;overflow-y:auto;"></div>
       </div>
       <div id="race-join-section" style="display:none;margin-top:1rem;">
         <div class="card" style="text-align:center;">
@@ -2188,6 +2194,30 @@ async function joinRace(){
 let joinOrbitAnim=null,joinOrbitSats=[],joinOrbitT=0,joinOrbitParticles=[];
 const JEARTH_R=22;
 
+function toggleJoinOrbitList(){
+  const list=document.getElementById('join-orbit-list');
+  const icon=document.getElementById('join-orbit-toggle-icon');
+  if(!list)return;
+  const open=list.style.display==='none';
+  list.style.display=open?'block':'none';
+  if(icon)icon.textContent=open?'명단 닫기 ▲':'명단 보기 ▼';
+}
+
+function updateJoinOrbitList(entries){
+  const list=document.getElementById('join-orbit-list');
+  if(!list)return;
+  if(!entries||!entries.length){list.innerHTML='<div style="font-size:12px;color:var(--text-hint);">아직 참여자가 없습니다</div>';return;}
+  list.innerHTML=entries.map((e,i)=>{
+    const name=e.name||e;
+    const isSelf=name===app.name;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:5px 4px;${i<entries.length-1?'border-bottom:1px solid rgba(0,200,255,0.08);':''}">
+      <span style="font-size:10px;color:rgba(0,200,255,0.4);width:18px;text-align:right;flex-shrink:0;">${i+1}</span>
+      <span style="width:10px;height:10px;border-radius:50%;background:${RC[i%RC.length]};flex-shrink:0;${isSelf?'box-shadow:0 0 6px '+RC[i%RC.length]+';':''}"></span>
+      <span style="font-size:13px;font-weight:${isSelf?'900':'500'};color:${isSelf?'#00ff88':'rgba(200,230,255,0.85)'};">${name}${isSelf?' 🛸':''}</span>
+    </div>`;
+  }).join('');
+}
+
 function startJoinOrbitPreview(entries,newName=null){
   const canvas=document.getElementById('join-orbit-canvas');
   const wrap=document.getElementById('join-orbit-wrap');
@@ -2195,6 +2225,12 @@ function startJoinOrbitPreview(entries,newName=null){
   if(!entries||!entries.length){wrap.style.display='none';if(joinOrbitAnim)cancelAnimationFrame(joinOrbitAnim);return;}
   if(joinOrbitAnim){cancelAnimationFrame(joinOrbitAnim);joinOrbitAnim=null;}
   wrap.style.display='block';
+  // 내 위성 라벨
+  const myLabel=document.getElementById('join-orbit-my-label');
+  const isMeIn=entries.some(e=>(e.name||e)===app.name);
+  if(myLabel)myLabel.style.display=isMeIn?'block':'none';
+  // 명단 업데이트
+  updateJoinOrbitList(entries);
   // 레이아웃 반영 후 실제 너비 읽기
   requestAnimationFrame(()=>{
   const W=canvas.offsetWidth||280; canvas.width=W; canvas.height=Math.round(W*0.72);
@@ -2253,7 +2289,7 @@ function drawJoinOrbit(canvas,W,H,CX,CY){
     ctx.globalAlpha=s.opacity;
     if(isSelf&&!s.launching){const p=0.45+0.45*Math.sin(joinOrbitT*4);ctx.strokeStyle=`rgba(255,255,255,${p})`;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(s.x,s.y,r+4,0,Math.PI*2);ctx.stroke();}
     ctx.shadowColor=s.color;ctx.shadowBlur=isSelf?10:5;ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(s.x,s.y,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
-    ctx.fillStyle=isSelf?'#fff':'rgba(0,0,0,0.8)';ctx.font=`bold ${Math.max(5,Math.round(r*0.75))}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.name.slice(0,2),s.x,s.y);ctx.textBaseline='alphabetic';
+    ctx.fillStyle=isSelf?'#fff':'rgba(0,0,0,0.8)';ctx.font=`bold ${Math.max(5,Math.round(r*0.75))}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(s.name.slice(-2),s.x,s.y);ctx.textBaseline='alphabetic';
     if(isSelf){ctx.fillStyle='rgba(255,255,255,0.85)';ctx.font='bold 8px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=3;ctx.fillText('👤'+s.name,s.x,s.y-r-8);ctx.shadowBlur=0;ctx.textBaseline='alphabetic';}
     ctx.globalAlpha=1;
   });
