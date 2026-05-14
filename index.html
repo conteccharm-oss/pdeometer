@@ -569,6 +569,10 @@
         <button id="spd-btn-2" onclick="setUserSpeedBoost(2.0)" style="padding:5px 13px;font-size:12px;font-weight:700;font-family:inherit;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(180,200,255,0.7);cursor:pointer;">×2</button>
       </div>
       <div id="race-status" style="text-align:center;margin-top:8px;font-size:13px;color:var(--text-hint);"></div>
+      <!-- 레이스 종료 후 저장 버튼 (오버레이와 별개로 항상 접근 가능) -->
+      <div id="race-save-btn-wrap" style="display:none;margin-top:10px;">
+        <button class="btn-main" style="width:100%;background:linear-gradient(135deg,#003a10,#005a1a);border:2px solid rgba(0,220,120,0.6);color:#00ff88;font-size:15px;font-weight:900;padding:14px 0;letter-spacing:0.5px;box-shadow:0 0 20px rgba(0,200,100,0.3);" onclick="saveRaceWinner()">💾 결과 저장 &amp; 직원 공유</button>
+      </div>
     </div>
 
     <!-- 레이스 결과 -->
@@ -2886,6 +2890,7 @@ async function startOrbitalRace(){
   window._podiumState={active:false,rank:3};
   window._finaleStarted=false; window._finaleBaseT=null;
   window._raceResultShown=false;
+  const _sbWrap=document.getElementById('race-save-btn-wrap');if(_sbWrap)_sbWrap.style.display='none';
   window._userSpeedBoost=1.0; window._eventSlowEndTime=0;
   const _sc=document.getElementById('race-speed-ctrl');if(_sc)_sc.style.display='flex';
   setUserSpeedBoost(1.0);
@@ -2923,6 +2928,7 @@ async function startOrbitalRace(){
   const _isReplay2=!!(window._replayMode&&window._replaySeed);
   raceSeed=_isReplay2?Number(window._replaySeed):Date.now(); // Number() — DB bigint는 문자열로 반환됨
   if(_isReplay2){window._replayMode=false;window._replaySeed=null;window._replayNames=null;}
+  else{window._wasReplay=false;} // 신규 레이스: 이전 리플레이 플래그 반드시 초기화
   window._raceRNG=makeRaceRNG(raceSeed+7777); // 결정론적 레이스 RNG
   window._raceExtraAcc=0; // 소수점 속도 누산기 (Math.random 대체)
   raceSatNames=[...names];
@@ -3303,6 +3309,8 @@ function startWinnersFinale(winners){
   // 1초 후 raceDone (페이드 완료), 8초 후 HTML 결과창
   setTimeout(()=>{raceDone=true;},1100);
   setTimeout(()=>showRaceWinner(window._raceWinnersList||[raceWinner]),8000);
+  // 관리자(비리플레이)에게 저장 버튼 표시
+  if(app.isAdmin&&!window._wasReplay){const sb=document.getElementById('race-save-btn-wrap');if(sb)sb.style.display='block';}
 }
 
 function raceDraw(){
@@ -3710,13 +3718,14 @@ async function saveRaceWinner(){
     const ok=await SB.post('race_results',{year_month:ym,winner_name:w.name,race_seed:raceSeed,race_names:JSON.stringify(raceSatNames),rank:w.rank||1});
     if(!ok)allOk=false;
   }
+  const sb=document.getElementById('race-save-btn-wrap');if(sb)sb.style.display='none';
   if(allOk){
-    showToast('🎉 결과 저장 완료! 1~'+winners.length+'등 발표');
+    showToast('🎉 결과 저장 완료! 직원들이 확인할 수 있습니다');
     const announce=document.getElementById('race-winner-announce');
     if(announce)announce.style.display='none';
     loadRacePage();
   }else{
-    showToast('❌ 저장 실패 — DB 제약 문제입니다. Supabase에서 고유 제약 해제 필요');
+    showToast('❌ 저장 실패');
     const announce=document.getElementById('race-winner-announce');
     if(announce)announce.style.display='none';
     loadRacePage();
