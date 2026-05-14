@@ -792,6 +792,15 @@
     </div>
 
     <div id="admin-tab-race-mgmt" style="display:none;">
+      <!-- 레이스 즉시 실행 -->
+      <div style="background:linear-gradient(135deg,#000c20,#001030);border:1.5px solid rgba(0,200,255,0.35);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:16px;">🤖</span>
+          <span style="font-size:13px;font-weight:700;color:#00eeff;">자동운영 모드</span>
+        </div>
+        <div id="race-mgmt-auto-desc" style="font-size:12px;color:rgba(180,230,255,0.7);line-height:1.6;margin-bottom:10px;"></div>
+        <button onclick="runAutoRaceNow()" style="width:100%;padding:10px 0;font-size:13px;font-weight:700;font-family:inherit;border-radius:8px;border:1.5px solid rgba(0,220,120,0.5);background:rgba(0,180,100,0.15);color:#00ff88;cursor:pointer;">🚀 지금 바로 실행</button>
+      </div>
       <div class="card" style="margin-bottom:1rem;">
         <div style="font-size:14px;font-weight:700;margin-bottom:1rem;">🎁 이달의 경품 등록</div>
         <div class="m-field"><label>경품명</label><input type="text" id="reward-title" placeholder="예: 스타벅스 아메리카노"/></div>
@@ -3593,6 +3602,12 @@ function loadRaceAutoDaySetting(){
   if(hourInp)hourInp.value=getRaceAutoHour();
   updateRaceModeUI(getMonthRaceMode(ym));
   updateEffectiveDatePreview();
+  // 관리탭 자동운영 설명 업데이트
+  const descEl=document.getElementById('race-mgmt-auto-desc');
+  if(descEl){
+    const effectiveDate=getEffectiveRaceDate(ym);
+    descEl.textContent=formatKorDateTime(effectiveDate,getRaceAutoHour())+'에 자동으로 레이스가 진행됩니다.';
+  }
   SB.get('race_results','year_month=eq.'+ym+'&order=created_at.asc').then(r=>{
     const doneEl=document.getElementById('race-admin-done-notice');
     if(doneEl){
@@ -3625,7 +3640,15 @@ async function runAutoRaceNow(){
   const ym=getYM();
   const entries=await SB.get('race_entries','year_month=eq.'+ym+'&order=created_at.asc');
   if(!entries.length){showToast('❌ 참여자가 없습니다');return;}
-  await autoRunRace(entries.map(e=>e.name),ym);
+  // 관리자 페이지에서 호출 시 레이스 페이지로 이동 후 실행
+  if(app.isAdmin){
+    document.getElementById('nav-user').style.display='flex';
+    document.getElementById('nav-admin').style.display='none';
+    switchPage('race');
+    setTimeout(()=>autoRunRace(entries.map(e=>e.name),ym),400);
+  } else {
+    await autoRunRace(entries.map(e=>e.name),ym);
+  }
 }
 
 // 당첨자 목록 렌더링 (1~3등)
