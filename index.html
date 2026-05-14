@@ -2653,8 +2653,8 @@ function raceLoop(){
   const extra=(Math.random()<frac)?1:0;
   for(let i=0;i<steps+extra;i++) raceUpdate();
   raceDraw();
-  // 피날레 중 or RACE COMPLETE 오버레이 5초간 유지
-  const _keepGoing=!raceDone||(window._finaleStarted&&(window._finaleBaseT===null||raceT-window._finaleBaseT<5));
+  // 피날레 중 or RACE COMPLETE 오버레이 9초간 유지
+  const _keepGoing=!raceDone||(window._finaleStarted&&(window._finaleBaseT===null||raceT-window._finaleBaseT<9));
   if(_keepGoing)raceAnimId=requestAnimationFrame(raceLoop);
 }
 
@@ -2988,9 +2988,9 @@ function startWinnersFinale(winners){
   window._finaleStarted=true;
   window._finaleBaseT=null;
   window._finaleT=null;
-  // 1초 후 raceDone (페이드 완료), 4.5초 후 HTML 결과창
+  // 1초 후 raceDone (페이드 완료), 8초 후 HTML 결과창
   setTimeout(()=>{raceDone=true;},1100);
-  setTimeout(()=>showRaceWinner(window._raceWinnersList||[raceWinner]),4500);
+  setTimeout(()=>showRaceWinner(window._raceWinnersList||[raceWinner]),8000);
 }
 
 function raceDraw(){
@@ -3182,12 +3182,15 @@ function raceDraw(){
     if(ft>0){
       const wList=(window._raceWinnersList||[raceWinner]).filter(Boolean);
       const sorted=[...wList].sort((a,b)=>(a.rank||1)-(b.rank||1));
+      // 마지막 1.5초 페이드아웃
+      const _elapsed=window._finaleBaseT!==null?raceT-window._finaleBaseT:0;
+      const _exitAlpha=Math.min(1,Math.max(0,(9-_elapsed)/1.5));
       ctx.save();
       // 전체화면 어두운 배경
-      ctx.globalAlpha=Math.min(0.97,ft*1.8);
+      ctx.globalAlpha=Math.min(0.97,ft*1.8)*_exitAlpha;
       ctx.fillStyle='rgba(0,2,16,0.97)';ctx.fillRect(0,0,W,H);
       // 회전 별빛 반짝임
-      ctx.globalAlpha=ft*0.7;
+      ctx.globalAlpha=ft*0.7*_exitAlpha;
       const spkColors=['#FFD700','#FF6B6B','#00FF88','#00CCFF','#FF69B4','#B06AFF'];
       for(let k=0;k<18;k++){
         const sa=(k/18)*Math.PI*2+(raceT-window._finaleT)*0.6;
@@ -3199,7 +3202,7 @@ function raceDraw(){
       }
       ctx.shadowBlur=0;
       // 타이틀
-      ctx.globalAlpha=ft;
+      ctx.globalAlpha=ft*_exitAlpha;
       const ts=Math.max(22,Math.floor(W*0.088));
       ctx.font=`bold ${ts}px sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.shadowColor='#FFD700';ctx.shadowBlur=38+12*Math.sin(raceT*4);
@@ -3214,7 +3217,7 @@ function raceDraw(){
         const cf=Math.max(0,Math.min(1,(raceT-window._finaleT-0.3-i*0.38)/0.42));
         if(cf<=0)return;
         const cy=cY0+i*cGap,cx=W/2-cW/2+(1-cf)*W*0.16,mid=cy+cH/2;
-        ctx.save();ctx.globalAlpha=cf*ft;
+        ctx.save();ctx.globalAlpha=cf*ft*_exitAlpha;
         ctx.shadowColor=gc[i];ctx.shadowBlur=18*cf;
         ctx.fillStyle='rgba(4,3,20,0.97)';ctx.beginPath();ctx.roundRect(cx,cy,cW,cH,10);ctx.fill();
         ctx.strokeStyle=gc[i];ctx.lineWidth=2;ctx.beginPath();ctx.roundRect(cx,cy,cW,cH,10);ctx.stroke();
