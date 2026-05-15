@@ -4333,9 +4333,10 @@ async function loadRaceHistory(){
     [...run.rows].sort((a,b)=>(a.rank||1)-(b.rank||1)).forEach(r=>{
       const k=r.rank||1;if(!seenRank.has(k)&&k<=3){seenRank.add(k);deduped.push(r);}
     });
-    // 한국 시간(KST)으로 표시
-    const d=new Date(run.minTs);
-    const dateStr=d.toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Seoul'}).replace(/\. /g,'.').replace('.','.').replace(/\.$/, '');
+    // 한국 시간(KST)으로 표시 — UTC임을 명시해 파싱
+    const rawTs=run.minTs;
+    const d=new Date(rawTs.includes('+')||rawTs.endsWith('Z')?rawTs:rawTs+'+00:00');
+    const dateStr=d.toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Seoul'}).replace(/\. /g,'-').replace(/\-$/,'');
     return`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div>
