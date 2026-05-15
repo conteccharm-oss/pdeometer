@@ -4110,31 +4110,37 @@ async function loadRaceHistory(){
   const all=await SB.get('race_results','year_month=eq.'+ym+'&order=created_at.asc');
   if(!all.length){histEl.innerHTML='<div class="rank-empty">이번 달 레이스 내역이 없습니다</div>';return;}
 
-  // race_seed 기준으로 그룹화
+  // race_seed 기준으로 그룹화 — minTs(최초 저장 시각) 기준으로 정렬
   const runsMap=new Map();
   for(const r of all){
     const k=String(r.race_seed||'_');
-    if(!runsMap.has(k))runsMap.set(k,{seed:r.race_seed,rows:[],firstTs:r.created_at});
-    runsMap.get(k).rows.push(r);
+    if(!runsMap.has(k))runsMap.set(k,{seed:r.race_seed,rows:[],minTs:r.created_at});
     const g=runsMap.get(k);
-    if(r.created_at>g.firstTs)g.firstTs=r.created_at;
+    g.rows.push(r);
+    if(r.created_at<g.minTs)g.minTs=r.created_at;
   }
-  const runs=[...runsMap.values()].sort((a,b)=>b.firstTs.localeCompare(a.firstTs));
+  // 오래된 순으로 정렬 → 1회차가 가장 오래된 것
+  const runs=[...runsMap.values()].sort((a,b)=>a.minTs.localeCompare(b.minTs));
   const medals=['🥇','🥈','🥉'];
 
   histEl.innerHTML=runs.map((run,i)=>{
-    const sorted=[...run.rows].sort((a,b)=>(a.rank||1)-(b.rank||1));
-    const d=new Date(run.firstTs);
-    const dateStr=d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    // rank 기준 중복 제거 후 최대 3명만 표시
+    const deduped=[]; const seenRank=new Set();
+    [...run.rows].sort((a,b)=>(a.rank||1)-(b.rank||1)).forEach(r=>{
+      const k=r.rank||1;if(!seenRank.has(k)&&k<=3){seenRank.add(k);deduped.push(r);}
+    });
+    // 한국 시간(KST)으로 표시
+    const d=new Date(run.minTs);
+    const dateStr=d.toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Seoul'}).replace(/\. /g,'.').replace('.','.').replace(/\.$/, '');
     return`<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div>
-          <span style="font-size:12px;font-weight:700;color:#00eeff;">${runs.length-i}회차</span>
+          <span style="font-size:12px;font-weight:700;color:#00eeff;">${i+1}회차</span>
           <span style="font-size:11px;color:var(--text-hint);margin-left:8px;">${dateStr}</span>
         </div>
         <button onclick="deleteRaceRun(${JSON.stringify(run.seed)})" style="padding:4px 10px;background:rgba(226,75,74,0.15);color:var(--red);border:1px solid rgba(226,75,74,0.3);border-radius:8px;font-size:11px;font-family:inherit;cursor:pointer;">🗑️ 삭제</button>
       </div>
-      ${sorted.map((r,j)=>{const medal=medals[(r.rank||j+1)-1]||'🏅';return`<div style="font-size:13px;font-weight:600;padding:2px 0;color:#fff;">${medal} ${r.winner_name}</div>`;}).join('')}
+      ${deduped.map((r,j)=>{const medal=medals[(r.rank||j+1)-1]||'🏅';return`<div style="font-size:13px;font-weight:600;padding:2px 0;color:#fff;">${medal} ${r.winner_name}</div>`;}).join('')}
     </div>`;
   }).join('');
 }
