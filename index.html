@@ -366,8 +366,8 @@
       <div class="home-card" onclick="switchPage('quiz')">
         <div class="hc-accent" style="background:var(--purple)"></div>
         <div class="hc-icon">🚀</div>
-        <div class="hc-label">타임 퀴즈</div>
-        <div class="hc-desc">주 1회 · 주어진 시간 내 도전</div>
+        <div class="hc-label">우주 퀴즈 릴레이</div>
+        <div class="hc-desc">주 1회 · 타임 퀴즈</div>
         <div class="hc-action" style="color:var(--purple)">참여하기 →</div>
       </div>
       <div class="home-card" onclick="switchPage('funny')">
@@ -403,7 +403,7 @@
   <div class="page" id="page-quiz">
     <div class="quiz-banner">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:15px;font-weight:700;">🚀 타임 퀴즈</div>
+        <div style="font-size:15px;font-weight:700;">🚀 우주 퀴즈 릴레이</div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div onclick="showSurvivorPopup()" style="font-size:12px;background:rgba(255,255,255,0.15);border-radius:20px;padding:4px 12px;cursor:pointer;">생존자 <span id="quiz-alive">-</span>명 👁️</div>
           <button onclick="showInfoPopup('quiz',true)" style="font-size:12px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:4px 10px;color:rgba(255,255,255,0.7);cursor:pointer;font-family:inherit;">❓ 설명</button>
@@ -1178,7 +1178,7 @@
 <!-- 퀴즈 설명 팝업 -->
 <div class="pw-modal-overlay" id="quiz-info-overlay">
   <div class="pw-modal" style="max-width:380px;">
-    <div class="pw-modal-title" style="font-size:17px;">🚀 타임 퀴즈란?</div>
+    <div class="pw-modal-title" style="font-size:17px;">🚀 우주 퀴즈 릴레이란?</div>
     <div style="font-size:13px;color:var(--text-sub);line-height:1.9;margin-bottom:1.25rem;">
       <div style="margin-bottom:10px;">매주 관리자가 <strong style="color:#fff;">우주 관련 퀴즈</strong> 1문제를 등록해요.</div>
       <div style="display:flex;flex-direction:column;gap:8px;">
@@ -2427,7 +2427,7 @@ async function loadMyPage(){
       const correct=qs.filter(q=>q.is_correct).length;
       const wrong=qs.filter(q=>!q.is_correct).length;
       return `<div class="mypage-history-item">
-        <div class="mypage-history-title">${ym} 타임 퀴즈</div>
+        <div class="mypage-history-title">${ym} 퀴즈 릴레이</div>
         <div class="mypage-history-meta">정답 ${correct}회 · 오답/탈락 ${wrong}회 · 총 ${qs.length}회 참여</div>
         <div style="margin-top:6px;"><span class="status-pill ${wrong===0?'pill-approved':'pill-pending'}">${wrong===0?'🛡️ 생존 중':'💥 탈락'}</span></div>
       </div>`;
