@@ -4120,11 +4120,14 @@ function getRaceAutoDay(){return raceConfig.day!==null?raceConfig.day:parseInt(l
 function getRaceAutoHour(){return raceConfig.hour!==null?raceConfig.hour:parseInt(localStorage.getItem('contec_race_auto_hour')||'10');}
 function getRaceAutoMinute(){return raceConfig.minute!==null?raceConfig.minute:parseInt(localStorage.getItem('contec_race_auto_minute')||'0');}
 async function loadRaceConfig(){
-  const rows=await SB.get('app_settings','key=in.(race_auto_day,race_auto_hour,race_auto_minute)');
+  const ym=getYM();
+  const rows=await SB.get('app_settings','key=in.(race_auto_day,race_auto_hour,race_auto_minute,prize_tiers,race_mode_'+ym+')');
   rows.forEach(r=>{
     if(r.key==='race_auto_day'){raceConfig.day=parseInt(r.value);localStorage.setItem('contec_race_auto_day',r.value);}
     if(r.key==='race_auto_hour'){raceConfig.hour=parseInt(r.value);localStorage.setItem('contec_race_auto_hour',r.value);}
     if(r.key==='race_auto_minute'){raceConfig.minute=parseInt(r.value);localStorage.setItem('contec_race_auto_minute',r.value);}
+    if(r.key==='prize_tiers'){localStorage.setItem('contec_prize_tiers',r.value);}
+    if(r.key==='race_mode_'+ym){localStorage.setItem('contec_race_mode_'+ym,r.value);}
   });
 }
 function getMonthRaceMode(ym){return localStorage.getItem('contec_race_mode_'+ym)||'auto';}
@@ -4209,7 +4212,9 @@ async function resetAutoRunDate(){
 }
 
 function setMonthRaceMode(mode){
-  localStorage.setItem('contec_race_mode_'+getYM(),mode);
+  const ym=getYM();
+  localStorage.setItem('contec_race_mode_'+ym,mode);
+  SB.upsert('app_settings',{key:'race_mode_'+ym,value:mode},'key');
   updateRaceModeUI(mode);
 }
 
@@ -4602,7 +4607,9 @@ function savePrizeTiers(){
     const el=document.getElementById('prize-input-'+i);
     if(el)t.prize=el.value.trim();
   });
-  localStorage.setItem('contec_prize_tiers',JSON.stringify(tiers));
+  const json=JSON.stringify(tiers);
+  localStorage.setItem('contec_prize_tiers',json);
+  SB.upsert('app_settings',{key:'prize_tiers',value:json},'key');
   showToast('✅ 경품 설정 저장 완료!');
   loadQuizPrizeTiers();
 }
