@@ -2820,6 +2820,15 @@ async function joinRace(){
     document.getElementById('race-joined-badge').style.display='block';
     return;
   }
+  // 경품 투표 여부 먼저 확인
+  const myVote=await SB.get('reward_votes','year_month=eq.'+ym+'&name=eq.'+encodeURIComponent(app.name));
+  if(!myVote.length){
+    showToast('🎁 경품 투표를 먼저 해주세요!');
+    document.getElementById('race-vote-section').scrollIntoView({behavior:'smooth',block:'start'});
+    const rewardList=document.getElementById('reward-list');
+    if(rewardList){rewardList.style.transition='box-shadow 0.3s';rewardList.style.boxShadow='0 0 0 2px rgba(0,200,255,0.6)';setTimeout(()=>rewardList.style.boxShadow='',1800);}
+    return;
+  }
   const ok=await SB.insertIgnore('race_entries',{year_month:ym,name:app.name});
   if(ok){
     showToast('🚀 레이스 참여 완료!');
